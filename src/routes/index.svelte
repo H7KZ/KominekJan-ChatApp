@@ -1,40 +1,37 @@
 <script lang="ts">
-    import Signin from '/src/components/common/signin.svelte';
+	import Signin from '/src/components/common/Signin.svelte';
 
-    import firebase from 'firebase/compat/app';
-    import { getFirestore } from 'firebase/firestore';
-    import { getAuth, onAuthStateChanged } from 'firebase/auth';
+	import { getAuth } from 'firebase/auth';
 
-    let firebaseConfig = {
-        apiKey: "AIzaSyBucAtqgeNfpU3XzV8CHo7XZK7ZE3rm3hc",
-        authDomain: "pva-chatapp.firebaseapp.com",
-        projectId: "pva-chatapp",
-        storageBucket: "pva-chatapp.appspot.com",
-        messagingSenderId: "708283718903",
-        appId: "1:708283718903:web:54ff8a4b98de326708c7f2",
-        measurementId: "G-L3PMPPPX7Y"
-    }
+	import { onMount } from 'svelte';
 
-    firebase.initializeApp(firebaseConfig);
+	const auth = getAuth();
 
-    const auth = getAuth();
-    const firestore = getFirestore();
+	const userLoggedIn = auth.currentUser;
 
-    const userLoggedIn = onAuthStateChanged(auth, (user) => {
-        if (user) {
-            return true;
-        } else {
-            return false;
-        }
-    });
+	onMount(() => {
+		console.log(auth.currentUser);
+	})
 </script>
 
 <div>
-    <div>
-        {#if userLoggedIn}
-            <Signin />
-        {:else}
-            <button>Chat room</button>
-        {/if}
-    </div>
+	<div class="min-h-screen h-full w-full flex flex-col gap-12 items-center pt-52">
+		<div class="w-full font-ms font-semibold text-2xl text-grayWhite text-center sm:text-4xl">
+			<h1>
+				<span class="font-bold italic text-[#cbff6a]">The best chat room ever</span><br />(no cap).
+			</h1>
+		</div>
+		{#if !userLoggedIn}
+			<Signin />
+		{:else}
+			<div>
+				<a href="/chatroom">
+					<button> ChatRoom </button>
+				</a>
+				<a href="/">
+					<button> Logout </button>
+				</a>
+			</div>
+		{/if}
+	</div>
 </div>

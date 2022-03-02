@@ -33,6 +33,8 @@
   },
   "type": "module",
   "dependencies": {
-    "firebase": "^9.6.7"
+    "firebase": "^9.6.7",
+    "svelte-forms-lib": "^2.0.1",
+    "yup": "^0.32.11"
   }
 }
