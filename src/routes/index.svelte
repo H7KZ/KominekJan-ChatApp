@@ -1,17 +1,22 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+
 	import Signin from '/src/components/common/Signin.svelte';
+	import Menu from '/src/components/common/Menu.svelte';
 
 	import { getAuth } from 'firebase/auth';
 
-	import { onMount } from 'svelte';
-
 	const auth = getAuth();
 
-	const userLoggedIn = auth.currentUser;
+	let loggedUser;
 
-	onMount(() => {
-		console.log(auth.currentUser);
-	})
+	onMount(async () => {
+		auth.onAuthStateChanged((user) => {
+			if (user) {
+				loggedUser = user;
+			}
+		});
+	});
 </script>
 
 <div>
@@ -21,17 +26,10 @@
 				<span class="font-bold italic text-[#cbff6a]">The best chat room ever</span><br />(no cap).
 			</h1>
 		</div>
-		{#if !userLoggedIn}
+		{#if !loggedUser}
 			<Signin />
 		{:else}
-			<div>
-				<a href="/chatroom">
-					<button> ChatRoom </button>
-				</a>
-				<a href="/">
-					<button> Logout </button>
-				</a>
-			</div>
+			<Menu />
 		{/if}
 	</div>
 </div>

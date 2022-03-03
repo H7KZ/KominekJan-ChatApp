@@ -11,7 +11,9 @@
 >
 	<div class="w-full hidden md:flex flex-row items-center justify-between font-ms text-[#eaf2ff]">
 		<div class="font-bold text-grayWhite text-2xl uppercase">
-			<h1>komínekjan</h1>
+			<a href="https://kominekjan.cz/">
+				<h1>komínekjan</h1>
+			</a>
 		</div>
 		<div class="flex gap-6 items-center font-medium text-xl">
 
