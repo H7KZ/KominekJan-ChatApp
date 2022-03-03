@@ -11,9 +11,6 @@
 
 	function LogIn() {
 		signInWithPopup(auth, provider)
-			.then((credentials) => {
-				console.log(credentials.user);
-			})
 			.catch((error) => {
 				errorCode = error.code;
 				errorMessage = error.message;

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Signin from '/src/components/common/signin.svelte';
+	import Signin from '/src/components/common/Signin.svelte';
 	import ChatRoom from '/src/components/ChatRoom.svelte';
 
 	import { getAuth } from 'firebase/auth';
