@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Signin from '/src/components/common/Signin.svelte';
+	import SignIn from '/src/components/common/SignIn.svelte';
 	import Menu from '/src/components/common/Menu.svelte';
 
 	import { onMount } from 'svelte';
@@ -27,7 +27,7 @@
 	</div>
 
 	{#if !loggedUser}
-		<Signin />
+		<SignIn />
 	{:else}
 		<div class="flex flex-col gap-4 items-center">
 			<h2 class="font-ms font-semibold text-xl text-grayWhite">You are already Logged In!</h2>

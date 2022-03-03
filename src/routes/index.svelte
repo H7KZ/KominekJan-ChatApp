@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 
-	import Signin from '/src/components/common/Signin.svelte';
+	import SignIn from '/src/components/common/SignIn.svelte';
 	import Menu from '/src/components/common/Menu.svelte';
 
 	import { getAuth } from 'firebase/auth';
@@ -27,7 +27,7 @@
 			</h1>
 		</div>
 		{#if !loggedUser}
-			<Signin />
+			<SignIn />
 		{:else}
 			<Menu />
 		{/if}
