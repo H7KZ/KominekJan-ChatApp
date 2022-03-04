@@ -19,7 +19,7 @@
 		<button
 			class="px-8 py-1 border-2 border-[#cbff6a] rounded bg-[#cbff6a] font-semibold text-base text-[#161616] transition-all hover:text-[#cbff6a] hover:bg-[#fff0]"
 		>
-			ChatRoom
+			Show ChatRoom
 		</button>
 	</a>
 	<a href="/">

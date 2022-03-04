@@ -19,9 +19,9 @@
 	});
 </script>
 
-<div class="min-h-screen h-full w-full flex flex-col items-center justify-center">
+<div class="min-h-screen h-full w-full flex flex-col gap-12 items-center pt-52">
 	{#if !loggedUser}
-	<h1 class="font-ms text-2xl text-cente font-bold text-[#cbff6a]r sm:text-4xl">
+	<h1 class="font-ms text-2xl text-center font-bold text-[#cbff6a] sm:text-4xl">
 		To enter a ChatRoom<br />
 		<span class="text-grayWhite font-semibold italic">Please log in</span>
 	</h1>
