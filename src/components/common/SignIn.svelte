@@ -10,13 +10,12 @@
 	let errorCredentials;
 
 	function LogIn() {
-		signInWithPopup(auth, provider)
-			.catch((error) => {
-				errorCode = error.code;
-				errorMessage = error.message;
-				errorEmail = error.email;
-				errorCredentials = GoogleAuthProvider.credentialFromError(error);
-			});
+		signInWithPopup(auth, provider).catch((error) => {
+			errorCode = error.code;
+			errorMessage = error.message;
+			errorEmail = error.email;
+			errorCredentials = GoogleAuthProvider.credentialFromError(error);
+		});
 	}
 </script>
 

@@ -1,10 +1,10 @@
 <script lang="ts">
-    import Navbar from "/src/components/common/Navbar.svelte";
+	import Navbar from '/src/components/common/Navbar.svelte';
 
-    import "/src/tailwind/tailwind.css";
+	import '/src/tailwind/tailwind.css';
 
-    import firebase from 'firebase/compat/app';
-    
+	import firebase from 'firebase/compat/app';
+
 	let firebaseConfig = {
 		apiKey: 'AIzaSyBucAtqgeNfpU3XzV8CHo7XZK7ZE3rm3hc',
 		authDomain: 'pva-chatapp.firebaseapp.com',
@@ -19,6 +19,6 @@
 </script>
 
 <div>
-    <Navbar />
-    <slot />
+	<Navbar />
+	<slot />
 </div>
