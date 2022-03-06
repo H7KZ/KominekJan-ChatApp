@@ -16,6 +16,12 @@
 
 	const wait = (timeToDelay) => new Promise((resolve) => setTimeout(resolve, timeToDelay));
 
+	const auth = getAuth();
+
+	const firestore = getFirestore();
+
+	const messagesRef = collection(firestore, 'messages');
+
 	//SCROLL TO BOTTOM OF THE MESSAGES WHEN PAGE IS LOADED
 
 	let messagesContainer;
@@ -29,13 +35,75 @@
 		}
 	});
 
+	
+	//CHECKING THE DATABASE FOR CHANGES ON COLLECTION OF MESSAGES
+
+	const messagesQuery = query(messagesRef, orderBy('createdAt'), limitToLast(50));
+
+	let messages = [];
+
+	onSnapshot(messagesQuery, (querySnapshot) => {
+		const messagesData = [];
+		querySnapshot.docs.forEach((doc) => {
+			messagesData.push(doc.data());
+		});
+		messages = messagesData;
+		messagesContainer.scrollTop = messagesContainer.scrollHeight;
+	});
+
+	function formatDate(time) {
+		let timestamp = new Date(time * 1000);
+
+		timestamp.setFullYear(timestamp.getFullYear() - 1969);
+		timestamp.setMonth(timestamp.getMonth() + 1);
+
+		let todayDate = new Date(Date.now());
+
+		todayDate.setMonth(todayDate.getMonth() + 1);
+
+		if (todayDate.toLocaleDateString() === timestamp.toLocaleDateString()) {
+			return (
+				'today at ' +
+				timestamp.getHours() +
+				':' +
+				(timestamp.getMinutes() < 10 ? '0' : '') +
+				timestamp.getMinutes()
+			);
+		}
+
+		todayDate.setDate(todayDate.getDate() - 1);
+
+		if (
+			todayDate.getDate() === timestamp.getDate() &&
+			todayDate.getMonth() === timestamp.getMonth() &&
+			todayDate.getFullYear() === timestamp.getFullYear()
+		) {
+			return (
+				'yesterday at ' +
+				timestamp.getHours() +
+				':' +
+				(timestamp.getMinutes() < 10 ? '0' : '') +
+				timestamp.getMinutes()
+			);
+		}
+
+		return (
+			(timestamp.getDate() < 10 ? '0' : '') +
+			timestamp.getDate() +
+			'.' +
+			(timestamp.getMonth() < 10 ? '0' : '') +
+			timestamp.getMonth() +
+			'.' +
+			timestamp.getFullYear() +
+			' ' +
+			timestamp.getHours() +
+			':' +
+			(timestamp.getMinutes() < 10 ? '0' : '') +
+			timestamp.getMinutes()
+		);
+	}
+
 	//SENDING MESSAGE CODE
-
-	const auth = getAuth();
-
-	const firestore = getFirestore();
-
-	const messagesRef = collection(firestore, 'messages');
 
 	let messageText;
 	let messageTextField;
@@ -57,35 +125,12 @@
 		});
 	}
 
-	//CHECKING THE DATABASE FOR CHANGES ON COLLECTION OF MESSAGES
+	function sendMessageEnter(e) {
+		e.preventDefault();
 
-	const messagesQuery = query(messagesRef, orderBy('createdAt'), limitToLast(50));
-
-	let messages = [];
-
-	onSnapshot(messagesQuery, (querySnapshot) => {
-		const messagesData = [];
-		querySnapshot.docs.forEach((doc) => {
-			messagesData.push(doc.data());
-		});
-		messages = messagesData;
-		messagesContainer.scrollTop = messagesContainer.scrollHeight;
-	});
-
-	function formatDate(time) {
-		let timestamp = new Date(time * 1000);
-
-		return (
-			timestamp.getDate() +
-			'.' +
-			timestamp.getMonth() +
-			'.' +
-			(timestamp.getFullYear() - 1969) +
-			' ' +
-			timestamp.getHours() +
-			':' +
-			timestamp.getMinutes()
-		);
+		if (e.keyCode == 13 && !e.shiftKey) {
+			sendMessage(e);
+		}
 	}
 </script>
 
@@ -94,7 +139,7 @@
 		class="w-full h-full overflow-y-scroll scroll-smooth custom-scrollbar"
 		bind:this={messagesContainer}
 	>
-	<!--DISPLAYING MESSAGES-->
+		<!--DISPLAYING MESSAGES-->
 		{#each messages as message}
 			<div class="flex gap-2 text-grayWhite mt-3">
 				<img src={message.photoURL} alt="userPhoto" class="rounded-full h-12" />
@@ -126,6 +171,7 @@
 				placeholder="Type your message"
 				bind:this={messageTextField}
 				bind:value={messageText}
+				on:keyup={() => sendMessageEnter(event)}
 				required
 			/>
 			<button
