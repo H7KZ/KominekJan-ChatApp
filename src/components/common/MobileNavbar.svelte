@@ -1,7 +1,7 @@
 <script lang="ts">
-	export let showMobileNavbar = false;
+	export let showMobileNavbar: boolean = false;
 
-	let fillColor = '#C1C8D8';
+	let fillColor: String = '#C1C8D8';
 </script>
 
 <div

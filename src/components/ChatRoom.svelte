@@ -25,7 +25,7 @@
 	//SCROLL TO BOTTOM OF THE MESSAGES WHEN PAGE IS LOADED
 
 	let messagesContainer;
-	let loaded = false;
+	let loaded: boolean = false;
 
 	onMount(async () => {
 		while (messagesContainer.scrollTop != messagesContainer.scrollHeight && !loaded) {
@@ -52,12 +52,12 @@
 	});
 
 	function formatDate(time) {
-		let timestamp = new Date(time * 1000);
+		let timestamp:Date = new Date(time * 1000);
 
 		timestamp.setFullYear(timestamp.getFullYear() - 1969);
 		timestamp.setMonth(timestamp.getMonth() + 1);
 
-		let todayDate = new Date(Date.now());
+		let todayDate:Date = new Date(Date.now());
 
 		todayDate.setMonth(todayDate.getMonth() + 1);
 
@@ -105,7 +105,7 @@
 
 	//SENDING MESSAGE CODE
 
-	let messageText;
+	let messageText: String;
 	let messageTextField;
 
 	async function sendMessage(e) {

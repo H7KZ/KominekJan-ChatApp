@@ -4,11 +4,11 @@
 
 	import { onMount } from 'svelte';
 
-	import { getAuth } from 'firebase/auth';
+	import { getAuth, type User } from 'firebase/auth';
 
 	const auth = getAuth();
 
-	let loggedUser;
+	let loggedUser: User;
 
 	onMount(async () => {
 		auth.onAuthStateChanged((user) => {

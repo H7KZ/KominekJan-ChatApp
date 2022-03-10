@@ -19,13 +19,13 @@
 	}
 </script>
 
-<div class="w-3/4 flex flex-col items-center sm:w-96">
+<div class="w-3/4 flex flex-col items-center sm:w-96 text-grayWhite">
 	<button
 		on:click={LogIn}
 		class="px-8 py-1 border-2 border-[#cbff6a] rounded bg-[#cbff6a] font-semibold text-base text-[#161616] transition-all hover:text-[#cbff6a] hover:bg-[#fff0]"
 		>Log in with Google</button
 	>
-	{#if errorCode && errorMessage}
+	{#if errorCode}
 		{errorCode}
 	{:else if errorMessage}
 		{errorMessage}

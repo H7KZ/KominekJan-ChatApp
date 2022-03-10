@@ -1,9 +1,9 @@
 <script lang="ts">
 	import MobileNavbar from '/src/components/common/MobileNavbar.svelte';
 
-	let fillColor = '#C1C8D8';
+	let fillColor: String = '#C1C8D8';
 
-	let showMobileNavbar = false;
+	let showMobileNavbar: boolean = false;
 </script>
 
 <div
