@@ -1,18 +1,18 @@
 <script lang="ts">
 	import {
-		getFirestore,
-		collection,
 		addDoc,
-		serverTimestamp,
-		query,
-		orderBy,
+		collection,
+		getFirestore,
 		limitToLast,
-		onSnapshot
+		onSnapshot,
+		orderBy,
+		query,
+		serverTimestamp
 	} from 'firebase/firestore';
 
-	import { getAuth } from 'firebase/auth';
+	import {getAuth} from 'firebase/auth';
 
-	import { onMount } from 'svelte';
+	import {onMount} from 'svelte';
 
 	const wait = (timeToDelay) => new Promise((resolve) => setTimeout(resolve, timeToDelay));
 

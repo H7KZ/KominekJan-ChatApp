@@ -2,9 +2,9 @@
 	import SignIn from '/src/components/common/SignIn.svelte';
 	import ChatRoom from '/src/components/ChatRoom.svelte';
 
-	import { onMount } from 'svelte';
+	import {onMount} from 'svelte';
 
-	import { getAuth, type User } from 'firebase/auth';
+	import {getAuth, type User} from 'firebase/auth';
 
 	const auth = getAuth();
 

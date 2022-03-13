@@ -6,3 +6,5 @@ node_modules
 .env
 .env.*
 !.env.example
+.idea/workspace.xml
+.idea/vcs.xml
