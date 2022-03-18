@@ -38,7 +38,7 @@
 	
 	//CHECKING THE DATABASE FOR CHANGES ON COLLECTION OF MESSAGES
 
-	const messagesQuery = query(messagesRef, orderBy('createdAt'), limitToLast(50));
+	const messagesQuery = query(messagesRef, orderBy('createdAt'), limitToLast(25));
 
 	let messages = [];
 
@@ -108,21 +108,29 @@
 	let messageText: String;
 	let messageTextField;
 
+	let sendTime = Date.now();
+	let sendFirstMessage = true;
+
 	async function sendMessage(e) {
 		e.preventDefault();
 
-		const { uid, photoURL, displayName } = auth.currentUser;
+		if (new Date().getTime() - sendTime > 10000 || sendFirstMessage) {
+			sendFirstMessage = false;
+			sendTime = Date.now();
+			timeout();
+			const { uid, photoURL, displayName } = auth.currentUser;
 
-		await addDoc(messagesRef, {
-			name: displayName,
-			uid,
-			text: messageText,
-			createdAt: serverTimestamp(),
-			photoURL
-		}).then(() => {
-			messageTextField.value = '';
-			messagesContainer.scrollTop = messagesContainer.scrollHeight;
-		});
+			await addDoc(messagesRef, {
+				name: displayName,
+				uid,
+				text: messageText,
+				createdAt: serverTimestamp(),
+				photoURL
+			}).then(() => {
+				messageTextField.value = '';
+				messagesContainer.scrollTop = messagesContainer.scrollHeight;
+			});
+		}
 	}
 
 	function sendMessageEnter(e) {
@@ -131,6 +139,22 @@
 		if (e.keyCode == 13 && !e.shiftKey) {
 			sendMessage(e);
 		}
+	}
+
+	let timeoutTime = 0;
+	let showInterval = false;
+
+	function timeout() {
+		let time = 10;
+		showInterval = true;
+		const interval = setInterval(() => {
+			timeoutTime = time;
+			time--;
+		}, 1000);
+		setTimeout(() => {
+			clearInterval(interval);
+			showInterval = false;
+		}, 11000);
 	}
 </script>
 
@@ -185,6 +209,7 @@
 				>
 			</button>
 		</form>
+		<p class="{showInterval ? 'text-[#c93939]' : 'text-[#3bbe51]'}">{showInterval ? "Wait " + timeoutTime + "s before you can send another message!" : "You can send a message!"}</p>
 	</div>
 </div>
 
