@@ -1,7 +1,7 @@
 <script lang="ts">
 	import {
 		doc,
-		addDoc,
+		getDoc,
 		setDoc,
 		writeBatch,
 		collection,
@@ -24,8 +24,6 @@
 	const firestore = getFirestore();
 
 	const messagesRef = collection(firestore, 'messages');
-
-	const usersRef = collection(firestore, 'users');
 
 	//SCROLL TO BOTTOM OF THE MESSAGES WHEN PAGE IS LOADED
 
@@ -121,23 +119,35 @@
 
 		if (new Date().getTime() - sendTime > 10000 || sendFirstMessage) {
 			
-			const { uid, photoURL, displayName } = auth.currentUser;
-
 			const batch = writeBatch(firestore);
 
-			const userRef = doc(firestore, 'users', uid);
+			const userRef = doc(firestore, 'users', auth.currentUser.uid);
+
+			await getDoc(userRef)
+			.then((docSnapshot) => {
+				if (!docSnapshot.exists) {
+					setDoc(userRef, {
+						uid: auth.currentUser.uid,
+						timestamp: serverTimestamp()
+					})
+					.catch((error) => {window.alert(error)})
+				}
+			});
+
 			batch.set(userRef, {
+				uid: auth.currentUser.uid,
 				timestamp: serverTimestamp()
 			});
 
 			const messageRef = doc(collection(firestore, 'messages'));
 			batch.set(messageRef, {
-				name: displayName,
-				uid,
+				name: auth.currentUser.displayName,
+				uid: auth.currentUser.uid,
 				text: messageText,
 				createdAt: serverTimestamp(),
-				photoURL
+				photoURL: auth.currentUser.photoURL
 			});
+
 			batch.commit()
 			.then(() => {
 				sendFirstMessage = false;
