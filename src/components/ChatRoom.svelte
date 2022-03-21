@@ -31,6 +31,16 @@
 	let loaded: boolean = false;
 
 	onMount(async () => {
+		const userRef = doc(firestore, 'users', auth.currentUser.uid);
+
+		await getDoc(userRef)
+		.then((docSnapshot) => {
+			if (!docSnapshot.exists()) {
+				createNewUser(userRef);
+				timeout();
+			}
+		});
+
 		while (messagesContainer.scrollTop != messagesContainer.scrollHeight && !loaded) {
 			await wait(1000);
 			messagesContainer.scrollTop = messagesContainer.scrollHeight;
@@ -119,47 +129,54 @@
 
 		if (new Date().getTime() - sendTime > 10000 || sendFirstMessage) {
 			
-			const batch = writeBatch(firestore);
-
 			const userRef = doc(firestore, 'users', auth.currentUser.uid);
 
-			await getDoc(userRef)
-			.then((docSnapshot) => {
-				if (!docSnapshot.exists) {
-					setDoc(userRef, {
-						uid: auth.currentUser.uid,
-						timestamp: serverTimestamp()
-					})
-					.catch((error) => {window.alert(error)})
-				}
-			});
-
-			batch.set(userRef, {
-				uid: auth.currentUser.uid,
-				timestamp: serverTimestamp()
-			});
-
-			const messageRef = doc(collection(firestore, 'messages'));
-			batch.set(messageRef, {
-				name: auth.currentUser.displayName,
-				uid: auth.currentUser.uid,
-				text: messageText,
-				createdAt: serverTimestamp(),
-				photoURL: auth.currentUser.photoURL
-			});
-
-			batch.commit()
-			.then(() => {
-				sendFirstMessage = false;
-				sendTime = Date.now();
-				timeout();
-				messageTextField.value = '';
-				messagesContainer.scrollTop = messagesContainer.scrollHeight;
-			})
-			.catch((error) => {
-				window.alert(error);
-			});
+			sendMessageFunc(userRef);
 		}
+	}
+
+	async function sendMessageFunc(userRef) {
+		const batch = writeBatch(firestore);
+
+		batch.set(userRef, {
+			uid: auth.currentUser.uid,
+			timestamp: serverTimestamp()
+		});
+
+		const messageRef = doc(collection(firestore, 'messages'));
+		batch.set(messageRef, {
+			name: auth.currentUser.displayName,
+			uid: auth.currentUser.uid,
+			text: messageText,
+			createdAt: serverTimestamp(),
+			photoURL: auth.currentUser.photoURL
+		});
+
+		await batch.commit()
+		.then(() => {
+			sendFirstMessage = false;
+			sendTime = Date.now();
+			timeout();
+			messageTextField.value = '';
+			messagesContainer.scrollTop = messagesContainer.scrollHeight;
+		})
+		.catch((error) => {
+			window.alert(error + "line169");
+		});
+	}
+
+	async function createNewUser(userRef) {
+		await setDoc(userRef, {
+			uid: auth.currentUser.uid,
+			timestamp: serverTimestamp()
+		})
+		.then(() => {
+			return true;
+		})
+		.catch((error) => {
+			window.alert(error + "line182");
+			return false;
+		})
 	}
 
 	function sendMessageEnter(e) {
