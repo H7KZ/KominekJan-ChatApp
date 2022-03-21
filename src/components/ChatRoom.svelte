@@ -1,6 +1,9 @@
 <script lang="ts">
 	import {
+		doc,
 		addDoc,
+		setDoc,
+		writeBatch,
 		collection,
 		getFirestore,
 		limitToLast,
@@ -21,6 +24,8 @@
 	const firestore = getFirestore();
 
 	const messagesRef = collection(firestore, 'messages');
+
+	const usersRef = collection(firestore, 'users');
 
 	//SCROLL TO BOTTOM OF THE MESSAGES WHEN PAGE IS LOADED
 
@@ -115,20 +120,34 @@
 		e.preventDefault();
 
 		if (new Date().getTime() - sendTime > 10000 || sendFirstMessage) {
-			sendFirstMessage = false;
-			sendTime = Date.now();
-			timeout();
+			
 			const { uid, photoURL, displayName } = auth.currentUser;
 
-			await addDoc(messagesRef, {
+			const batch = writeBatch(firestore);
+
+			const userRef = doc(firestore, 'users', uid);
+			batch.set(userRef, {
+				timestamp: serverTimestamp()
+			});
+
+			const messageRef = doc(collection(firestore, 'messages'));
+			batch.set(messageRef, {
 				name: displayName,
 				uid,
 				text: messageText,
 				createdAt: serverTimestamp(),
 				photoURL
-			}).then(() => {
+			});
+			batch.commit()
+			.then(() => {
+				sendFirstMessage = false;
+				sendTime = Date.now();
+				timeout();
 				messageTextField.value = '';
 				messagesContainer.scrollTop = messagesContainer.scrollHeight;
+			})
+			.catch((error) => {
+				window.alert(error);
 			});
 		}
 	}
