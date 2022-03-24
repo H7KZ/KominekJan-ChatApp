@@ -10,7 +10,8 @@
 		onSnapshot,
 		orderBy,
 		query,
-		serverTimestamp
+		serverTimestamp,
+		increment
 	} from 'firebase/firestore';
 
 	import {getAuth} from 'firebase/auth';
@@ -31,12 +32,15 @@
 	let loaded: boolean = false;
 
 	onMount(async () => {
+		
 		const userRef = doc(firestore, 'users', auth.currentUser.uid);
 
 		await getDoc(userRef)
 		.then((docSnapshot) => {
 			if (!docSnapshot.exists()) {
 				createNewUser(userRef);
+				const cookieRef = doc(firestore, 'cookies', auth.currentUser.uid);
+				createNewCookie(cookieRef);
 				timeout();
 			}
 		});
@@ -152,6 +156,11 @@
 			photoURL: auth.currentUser.photoURL
 		});
 
+		const cookieRef = doc(firestore, 'cookies', auth.currentUser.uid);
+		batch.update(cookieRef, {
+			cookies: increment(1)
+		});
+
 		await batch.commit()
 		.then(() => {
 			sendFirstMessage = false;
@@ -161,7 +170,7 @@
 			messagesContainer.scrollTop = messagesContainer.scrollHeight;
 		})
 		.catch((error) => {
-			window.alert(error + "line169");
+			window.alert(error);
 		});
 	}
 
@@ -174,7 +183,21 @@
 			return true;
 		})
 		.catch((error) => {
-			window.alert(error + "line182");
+			window.alert(error);
+			return false;
+		})
+	}
+
+	async function createNewCookie(cookieRef) {
+		await setDoc(cookieRef, {
+			uid: auth.currentUser.uid,
+			cookies: 0
+		})
+		.then(() => {
+			return true;
+		})
+		.catch((error) => {
+			window.alert(error);
 			return false;
 		})
 	}

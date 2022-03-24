@@ -26,9 +26,15 @@
 				>
 			</div>
 
-			<a href="/chatroom" class="transition-colors ease-out duration-150 hover:text-[#c2ff4f]">
+			<div>
+				<a href="/chatroom" class="transition-colors ease-out duration-150 hover:text-[#c2ff4f]"
+					>ChatRoom</a
+				>
+			</div>
+
+			<a href="/shop" class="transition-colors ease-out duration-150 hover:text-[#c2ff4f]">
 				<button class="border-2 border-[#c2ff4f] rounded-md font-medium px-3 py-0.5">
-					ChatRoom
+					Shop
 				</button>
 			</a>
 		</div>

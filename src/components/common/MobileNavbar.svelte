@@ -23,12 +23,17 @@
 		</svg>
 	</div>
 	<ul class="font-ms font-semibold text-[#A6B0C7] text-2xl text-center">
+
 		<li class="m-3"><a href="/" on:click>Home</a></li>
+
 		<li class="m-3"><a href="/login" on:click>Login</a></li>
+
+		<li class="m-3"><a href="/chatroom" on:click>ChatRoom</a></li>
+
 		<li class="m-3">
-			<a href="/chatroom" on:click>
+			<a href="/shop" on:click>
 				<button class="border-2 border-[#c2ff4f] rounded-md font-medium px-3 py-0.5">
-					ChatRoom
+					Shop
 				</button>
 			</a>
 		</li>
