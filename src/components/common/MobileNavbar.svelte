@@ -28,12 +28,10 @@
 
 		<li class="m-3"><a href="/login" on:click>Login</a></li>
 
-		<li class="m-3"><a href="/chatroom" on:click>ChatRoom</a></li>
-
 		<li class="m-3">
-			<a href="/shop" on:click>
+			<a href="/chatroom" on:click>
 				<button class="border-2 border-[#c2ff4f] rounded-md font-medium px-3 py-0.5">
-					Shop
+					ChatRoom
 				</button>
 			</a>
 		</li>

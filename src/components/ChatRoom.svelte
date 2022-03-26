@@ -11,12 +11,14 @@
 		orderBy,
 		query,
 		serverTimestamp,
-		increment
+		increment,
+		where,
+		getDocs
 	} from 'firebase/firestore';
 
-	import {getAuth} from 'firebase/auth';
+	import { getAuth } from 'firebase/auth';
 
-	import {onMount} from 'svelte';
+	import { onMount } from 'svelte';
 
 	const wait = (timeToDelay) => new Promise((resolve) => setTimeout(resolve, timeToDelay));
 
@@ -32,15 +34,11 @@
 	let loaded: boolean = false;
 
 	onMount(async () => {
-		
 		const userRef = doc(firestore, 'users', auth.currentUser.uid);
 
-		await getDoc(userRef)
-		.then((docSnapshot) => {
+		await getDoc(userRef).then((docSnapshot) => {
 			if (!docSnapshot.exists()) {
 				createNewUser(userRef);
-				const cookieRef = doc(firestore, 'cookies', auth.currentUser.uid);
-				createNewCookie(cookieRef);
 				timeout();
 			}
 		});
@@ -52,7 +50,6 @@
 		}
 	});
 
-	
 	//CHECKING THE DATABASE FOR CHANGES ON COLLECTION OF MESSAGES
 
 	const messagesQuery = query(messagesRef, orderBy('createdAt'), limitToLast(25));
@@ -69,12 +66,12 @@
 	});
 
 	function formatDate(time) {
-		let timestamp:Date = new Date(time * 1000);
+		let timestamp: Date = new Date(time * 1000);
 
 		timestamp.setFullYear(timestamp.getFullYear() - 1969);
 		timestamp.setMonth(timestamp.getMonth() + 1);
 
-		let todayDate:Date = new Date(Date.now());
+		let todayDate: Date = new Date(Date.now());
 
 		todayDate.setMonth(todayDate.getMonth() + 1);
 
@@ -132,7 +129,6 @@
 		e.preventDefault();
 
 		if (new Date().getTime() - sendTime > 10000 || sendFirstMessage) {
-			
 			const userRef = doc(firestore, 'users', auth.currentUser.uid);
 
 			sendMessageFunc(userRef);
@@ -142,10 +138,15 @@
 	async function sendMessageFunc(userRef) {
 		const batch = writeBatch(firestore);
 
-		batch.set(userRef, {
-			uid: auth.currentUser.uid,
-			timestamp: serverTimestamp()
-		});
+		batch.set(
+			userRef,
+			{
+				uid: auth.currentUser.uid,
+				timestamp: serverTimestamp(),
+				sent: increment(1)
+			},
+			{ merge: true }
+		);
 
 		const messageRef = doc(collection(firestore, 'messages'));
 		batch.set(messageRef, {
@@ -156,50 +157,33 @@
 			photoURL: auth.currentUser.photoURL
 		});
 
-		const cookieRef = doc(firestore, 'cookies', auth.currentUser.uid);
-		batch.update(cookieRef, {
-			cookies: increment(1)
-		});
-
-		await batch.commit()
-		.then(() => {
-			sendFirstMessage = false;
-			sendTime = Date.now();
-			timeout();
-			messageTextField.value = '';
-			messagesContainer.scrollTop = messagesContainer.scrollHeight;
-		})
-		.catch((error) => {
-			window.alert(error);
-		});
+		await batch
+			.commit()
+			.then(() => {
+				sendFirstMessage = false;
+				sendTime = Date.now();
+				timeout();
+				messageTextField.value = '';
+				messagesContainer.scrollTop = messagesContainer.scrollHeight;
+			})
+			.catch((error) => {
+				window.alert(error);
+			});
 	}
 
 	async function createNewUser(userRef) {
 		await setDoc(userRef, {
 			uid: auth.currentUser.uid,
-			timestamp: serverTimestamp()
+			timestamp: serverTimestamp(),
+			sent: 0
 		})
-		.then(() => {
-			return true;
-		})
-		.catch((error) => {
-			window.alert(error);
-			return false;
-		})
-	}
-
-	async function createNewCookie(cookieRef) {
-		await setDoc(cookieRef, {
-			uid: auth.currentUser.uid,
-			cookies: 0
-		})
-		.then(() => {
-			return true;
-		})
-		.catch((error) => {
-			window.alert(error);
-			return false;
-		})
+			.then(() => {
+				return true;
+			})
+			.catch((error) => {
+				window.alert(error + 'user');
+				return false;
+			});
 	}
 
 	function sendMessageEnter(e) {
@@ -225,6 +209,18 @@
 			showInterval = false;
 		}, 11000);
 	}
+
+	async function userBadge(uid) {
+		let sent;
+		await getDoc(doc(firestore, 'users', uid)).then((doc) => {
+			sent = doc.get('sent');
+		});
+		if (sent >= 400) return '🦄';
+		if (sent >= 300) return '🦁';
+		if (sent >= 200) return '🦊';
+		if (sent >= 100) return '🐶';
+		if (sent >= 0) return '🙊';
+	}
 </script>
 
 <div class="h-3/4 w-full max-w-6xl flex flex-col gap-4 justify-between items-center px-4 font-ms">
@@ -235,13 +231,23 @@
 		<!--DISPLAYING MESSAGES-->
 		{#each messages as message}
 			<div class="flex gap-2 text-grayWhite mt-3">
-				<img src={message.photoURL} alt="userPhoto" class="rounded-full h-12" />
+				<div class="relative">
+					<img src={message.photoURL} alt="userPhoto" class="rounded-full h-12" />
+					<h2 class="absolute bottom-0 right-0">
+						{#await userBadge(message.uid) then badge}
+							{badge}
+						{/await}
+					</h2>
+				</div>
+				
 				<div class="flex flex-col">
 					<div>
 						<h2 class="text-base text-[#c6ff5be7]">
-							{message.name}&nbsp;&nbsp;&nbsp;<span class="text-xs text-[#9e9e9e]"
-								>{formatDate(message.createdAt)}</span
-							>
+							{message.name}
+							&nbsp;&nbsp;&nbsp;
+							<span class="text-xs text-[#9e9e9e]">
+								{formatDate(message.createdAt)}
+							</span>
 						</h2>
 					</div>
 					<p class="text-[#f0f0f0] text-sm">
@@ -278,7 +284,11 @@
 				>
 			</button>
 		</form>
-		<p class="{showInterval ? 'text-[#c93939]' : 'text-[#3bbe51]'}">{showInterval ? "Wait " + timeoutTime + "s before you can send another message!" : "You can send a message!"}</p>
+		<p class={showInterval ? 'text-[#c93939]' : 'text-[#3bbe51]'}>
+			{showInterval
+				? 'Wait ' + timeoutTime + 's before you can send another message!'
+				: 'You can send a message!'}
+		</p>
 	</div>
 </div>
 
