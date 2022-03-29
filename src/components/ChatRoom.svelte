@@ -11,9 +11,7 @@
 		orderBy,
 		query,
 		serverTimestamp,
-		increment,
-		where,
-		getDocs
+		increment
 	} from 'firebase/firestore';
 
 	import { getAuth } from 'firebase/auth';
@@ -70,6 +68,7 @@
 
 		timestamp.setFullYear(timestamp.getFullYear() - 1969);
 		timestamp.setMonth(timestamp.getMonth() + 1);
+		timestamp.setHours(timestamp.getHours() + 1);
 
 		let todayDate: Date = new Date(Date.now());
 
@@ -80,8 +79,7 @@
 				'today at ' +
 				timestamp.getHours() +
 				':' +
-				(timestamp.getMinutes() < 10 ? '0' : '') +
-				timestamp.getMinutes()
+				timestamp.getMinutes().toString().padStart(2, '0')
 			);
 		}
 
@@ -96,30 +94,26 @@
 				'yesterday at ' +
 				timestamp.getHours() +
 				':' +
-				(timestamp.getMinutes() < 10 ? '0' : '') +
-				timestamp.getMinutes()
+				timestamp.getMinutes().toString().padStart(2, '0')
 			);
 		}
 
 		return (
-			(timestamp.getDate() < 10 ? '0' : '') +
-			timestamp.getDate() +
+			timestamp.getDate().toString().padStart(2, '0') +
 			'.' +
-			(timestamp.getMonth() < 10 ? '0' : '') +
-			timestamp.getMonth() +
+			timestamp.getMonth().toString().padStart(2, '0') +
 			'.' +
 			timestamp.getFullYear() +
 			' ' +
 			timestamp.getHours() +
 			':' +
-			(timestamp.getMinutes() < 10 ? '0' : '') +
-			timestamp.getMinutes()
+			timestamp.getMinutes().toString().padStart(2, '0')
 		);
 	}
 
 	//SENDING MESSAGE CODE
 
-	let messageText: String = "";
+	let messageText: String = '';
 	let messageTextField;
 
 	let sendTime = Date.now();
@@ -128,7 +122,10 @@
 	async function sendMessage(e) {
 		e.preventDefault();
 
-		if (new Date().getTime() - sendTime > 10000 || sendFirstMessage && !showChars && !(messageText.trim().length === 0)) {
+		if (
+			new Date().getTime() - sendTime > 10000 ||
+			(sendFirstMessage && !showChars && !(messageText.trim().length === 0))
+		) {
 			const userRef = doc(firestore, 'users', auth.currentUser.uid);
 
 			messageText.trim();
@@ -191,7 +188,10 @@
 	function sendMessageEnter(e) {
 		e.preventDefault();
 
-		if (new Date().getTime() - sendTime > 10000 || sendFirstMessage && !showChars && !(messageText.trim().length === 0)) {
+		if (
+			new Date().getTime() - sendTime > 10000 ||
+			(sendFirstMessage && !showChars && !(messageText.trim().length === 0))
+		) {
 			if (e.keyCode == 13 && !e.shiftKey && !showChars) {
 				sendMessage(e);
 			}
@@ -260,7 +260,7 @@
 		<!--DISPLAYING MESSAGES-->
 		{#each messages as message}
 			<div class="flex gap-2 text-grayWhite mt-3 w-full">
-				<div class="w-12">
+				<div class="shrink-0 w-12">
 					<div class="relative w-full h-12">
 						<img src={message.photoURL} alt="userPhoto" class="rounded-full w-12" />
 						<h2 class="absolute bottom-0 right-0">
@@ -270,7 +270,7 @@
 						</h2>
 					</div>
 				</div>
-				
+
 				<div class="flex flex-col w-full">
 					<div>
 						<h2 class="text-base text-[#c6ff5be7]">
@@ -316,19 +316,18 @@
 				>
 			</button>
 		</form>
-		<div class="flex justify-between">
-			<p class={showInterval ? 'text-[#c93939]' : 'text-[#3bbe51]'}>
+		<div class="flex justify-between gap-12">
+			<p class="{showInterval ? 'text-[#c93939]' : 'text-[#3bbe51]'} text-left">
 				{showInterval
 					? 'Wait ' + timeoutTime + 's before you can send another message!'
 					: 'You can send a message!'}
 			</p>
-			<p class={showChars ? 'text-[#c93939]' : 'text-[#3bbe51]'}>
+			<p class="{showChars ? 'text-[#c93939]' : 'text-[#3bbe51]'} text-right">
 				{showChars
 					? 'maximum characters exceeded! ' + charsCount
 					: 'Not too many characters. good job! +' + charsCount}
 			</p>
 		</div>
-		
 	</div>
 </div>
 
