@@ -225,22 +225,17 @@
 
 <div class="h-3/4 w-full max-w-6xl flex flex-col gap-4 justify-between items-center px-4 font-ms">
 	<div
-		class="w-full h-full overflow-y-scroll scroll-smooth custom-scrollbar"
+		class="w-full h-full overflow-y-scroll overflow-x-clip scroll-smooth custom-scrollbar"
 		bind:this={messagesContainer}
 	>
 		<!--DISPLAYING MESSAGES-->
 		{#each messages as message}
-			<div class="flex gap-2 text-grayWhite mt-3">
+			<div class="flex gap-2 text-grayWhite mt-3 w-full">
 				<div class="relative">
-					<img src={message.photoURL} alt="userPhoto" class="rounded-full h-12" />
-					<h2 class="absolute bottom-0 right-0">
-						{#await userBadge(message.uid) then badge}
-							{badge}
-						{/await}
-					</h2>
+					<img src={message.photoURL} alt="userPhoto" class="rounded-full h-12 w-12" />
 				</div>
 				
-				<div class="flex flex-col">
+				<div class="flex flex-col w-full">
 					<div>
 						<h2 class="text-base text-[#c6ff5be7]">
 							{message.name}
@@ -250,7 +245,7 @@
 							</span>
 						</h2>
 					</div>
-					<p class="text-[#f0f0f0] text-sm">
+					<p class="text-[#f0f0f0] text-sm break-words w-5/6">
 						{message.text}
 					</p>
 				</div>
