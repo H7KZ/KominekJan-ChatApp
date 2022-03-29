@@ -119,7 +119,7 @@
 
 	//SENDING MESSAGE CODE
 
-	let messageText: String;
+	let messageText: String = "";
 	let messageTextField;
 
 	let sendTime = Date.now();
@@ -128,8 +128,10 @@
 	async function sendMessage(e) {
 		e.preventDefault();
 
-		if (new Date().getTime() - sendTime > 10000 || sendFirstMessage) {
+		if (new Date().getTime() - sendTime > 10000 || sendFirstMessage && !showChars && !(messageText.trim().length === 0)) {
 			const userRef = doc(firestore, 'users', auth.currentUser.uid);
+
+			messageText.trim();
 
 			sendMessageFunc(userRef);
 		}
@@ -189,8 +191,10 @@
 	function sendMessageEnter(e) {
 		e.preventDefault();
 
-		if (e.keyCode == 13 && !e.shiftKey) {
-			sendMessage(e);
+		if (new Date().getTime() - sendTime > 10000 || sendFirstMessage && !showChars && !(messageText.trim().length === 0)) {
+			if (e.keyCode == 13 && !e.shiftKey && !showChars) {
+				sendMessage(e);
+			}
 		}
 	}
 
@@ -210,6 +214,8 @@
 		}, 11000);
 	}
 
+	//DISPLAYING BADGES
+
 	async function userBadge(uid) {
 		let sent;
 		await getDoc(doc(firestore, 'users', uid)).then((doc) => {
@@ -221,6 +227,29 @@
 		if (sent >= 100) return '🐶';
 		if (sent >= 0) return '🙊';
 	}
+
+	//CHECKING LENGTH OF MESSAGE
+
+	let showChars = false;
+	let charsCount = 751;
+
+	function checkChars(e) {
+		e.preventDefault();
+
+		if (messageText.length > 751) {
+			showChars = true;
+			charsCount = 751 - messageText.length;
+			return;
+		} else if (messageText.length > 351 && !(messageText.indexOf(' ') !== -1)) {
+			showChars = true;
+			charsCount = charsCount = 351 - messageText.length;
+			return;
+		} else {
+			showChars = false;
+			charsCount = 751 - messageText.length;
+			return;
+		}
+	}
 </script>
 
 <div class="h-3/4 w-full max-w-6xl flex flex-col gap-4 justify-between items-center px-4 font-ms">
@@ -231,8 +260,15 @@
 		<!--DISPLAYING MESSAGES-->
 		{#each messages as message}
 			<div class="flex gap-2 text-grayWhite mt-3 w-full">
-				<div class="relative">
-					<img src={message.photoURL} alt="userPhoto" class="rounded-full h-12 w-12" />
+				<div class="w-12">
+					<div class="relative w-full h-12">
+						<img src={message.photoURL} alt="userPhoto" class="rounded-full w-12" />
+						<h2 class="absolute bottom-0 right-0">
+							{#await userBadge(message.uid) then badge}
+								{badge}
+							{/await}
+						</h2>
+					</div>
 				</div>
 				
 				<div class="flex flex-col w-full">
@@ -252,7 +288,7 @@
 			</div>
 		{/each}
 	</div>
-	<div class="w-full">
+	<div class="w-full flex flex-col gap-2">
 		<!--FORM FOR MESSAGES-->
 		<!-- svelte-ignore missing-declaration -->
 		<form
@@ -266,6 +302,7 @@
 				bind:this={messageTextField}
 				bind:value={messageText}
 				on:keyup={() => sendMessageEnter(event)}
+				on:keyup={() => checkChars(event)}
 				required
 			/>
 			<button
@@ -279,11 +316,19 @@
 				>
 			</button>
 		</form>
-		<p class={showInterval ? 'text-[#c93939]' : 'text-[#3bbe51]'}>
-			{showInterval
-				? 'Wait ' + timeoutTime + 's before you can send another message!'
-				: 'You can send a message!'}
-		</p>
+		<div class="flex justify-between">
+			<p class={showInterval ? 'text-[#c93939]' : 'text-[#3bbe51]'}>
+				{showInterval
+					? 'Wait ' + timeoutTime + 's before you can send another message!'
+					: 'You can send a message!'}
+			</p>
+			<p class={showChars ? 'text-[#c93939]' : 'text-[#3bbe51]'}>
+				{showChars
+					? 'maximum characters exceeded! ' + charsCount
+					: 'Not too many characters. good job! +' + charsCount}
+			</p>
+		</div>
+		
 	</div>
 </div>
 
