@@ -27,13 +27,13 @@
 		}
 
 		await axios
-			.post('http://localhost:5555/auth/signup', {
+			.post('http://api.chatapp.kominekjan.cz/auth/signup', {
 				email: value.email,
 				password: value.password,
 				display_name: value.display_name
 			})
 			.then(() => {
-				location.replace('http://localhost:3000/verify/pending');
+				location.replace('http://dev.chatapp.kominekjan.cz/verify/pending');
 			})
 			.catch((err) => {
 				if (err.response) {

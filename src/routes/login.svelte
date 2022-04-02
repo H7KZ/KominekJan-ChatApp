@@ -19,7 +19,7 @@
 				}
 			};
 			await axios
-				.post('http://localhost:5555/auth/isloggedin', {}, config)
+				.post('http://api.chatapp.kominekjan.cz/auth/isloggedin', {}, config)
 				.then(() => {
 					loggedUser = true;
 				})
@@ -49,7 +49,7 @@
 		}
 
 		await axios
-			.post('http://localhost:5555/auth/login', {
+			.post('http://api.chatapp.kominekjan.cz/auth/login', {
 				email: value.email,
 				password: value.password
 			})

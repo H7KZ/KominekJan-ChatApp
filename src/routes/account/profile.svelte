@@ -15,7 +15,7 @@
 				}
 			};
 			await axios
-				.post('http://localhost:5555/auth/isloggedin', {}, config)
+				.post('https://api.chatapp.kominekjan.cz/auth/isloggedin', {}, config)
 				.then(() => {
 					loggedUser = true;
 				})
