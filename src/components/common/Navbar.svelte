@@ -17,16 +17,32 @@
 		</div>
 		<div class="flex gap-6 items-center font-medium text-xl">
 			<div>
-				<a href="/" class="transition-colors ease-out duration-150 hover:text-[#c2ff4f]">Home</a>
-			</div>
-
-			<div>
-				<a href="/login" class="transition-colors ease-out duration-150 hover:text-[#c2ff4f]"
-					>Login</a
+				<a href="/" class="transition-colors ease-out duration-150 py-2 hover:text-[#c2ff4f]"
+					>Home</a
 				>
 			</div>
 
-			<a href="/chatroom" class="transition-colors ease-out duration-150 hover:text-[#c2ff4f]">
+			<div class="dropdown">
+				<div>
+					<p class="transition-colors ease-out duration-150 pl-3 pr-1.5 py-2 hover:text-[#c2ff4f]">
+						Account
+					</p>
+				</div>
+				<div class="hidden absolute w-28 flex-col gap-4 py-2 pl-3 bg-[#383838] dropdown-content">
+					<a
+						href="/account/profile"
+						class="transition-colors ease-out duration-150 hover:text-[#c2ff4f]">Profile</a
+					>
+					<a href="/login" class="transition-colors ease-out duration-150 hover:text-[#c2ff4f]"
+						>Login</a
+					>
+					<a href="/signup" class="transition-colors ease-out duration-150 hover:text-[#c2ff4f]"
+						>Signup</a
+					>
+				</div>
+			</div>
+
+			<a href="/chatroom" class="transition-colors ease-out duration-150 py-2 hover:text-[#c2ff4f]">
 				<button class="border-2 border-[#c2ff4f] rounded-md font-medium px-3 py-0.5">
 					ChatRoom
 				</button>
@@ -46,3 +62,9 @@
 	</div>
 </div>
 <MobileNavbar {showMobileNavbar} on:click={() => (showMobileNavbar = false)} />
+
+<style scoped>
+	.dropdown:hover .dropdown-content {
+		display: flex;
+	}
+</style>

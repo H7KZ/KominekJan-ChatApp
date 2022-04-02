@@ -1,22 +1,4 @@
 <script lang="ts">
-	import {onMount} from 'svelte';
-
-	import SignIn from '/src/components/common/SignIn.svelte';
-	import Menu from '/src/components/common/Menu.svelte';
-
-	import {getAuth, type User} from 'firebase/auth';
-
-	const auth = getAuth();
-
-	let loggedUser: User;
-
-	onMount(async () => {
-		auth.onAuthStateChanged((user) => {
-			if (user) {
-				loggedUser = user;
-			}
-		});
-	});
 </script>
 
 <div>
@@ -27,10 +9,5 @@
 				<span class="font-bold italic text-grayWhite">(no cap).</span>
 			</h1>
 		</div>
-		{#if !loggedUser}
-			<SignIn />
-		{:else}
-			<Menu />
-		{/if}
 	</div>
 </div>

@@ -1,37 +1,111 @@
 <script lang="ts">
-	import SignIn from '/src/components/common/SignIn.svelte';
-	import Menu from '/src/components/common/Menu.svelte';
+	import { onMount } from 'svelte';
 
-	import {onMount} from 'svelte';
+	import axios from 'axios';
 
-	import {getAuth, type User} from 'firebase/auth';
+	import loginSchema from '../components/joiSchemas/login';
 
-	const auth = getAuth();
-
-	let loggedUser: User;
+	let loggedUser: boolean = false;
+	let email: string;
+	let password: string;
+	let message: string = '';
 
 	onMount(async () => {
-		auth.onAuthStateChanged((user) => {
-			if (user) {
-				loggedUser = user;
-			}
-		});
+		const token = localStorage.getItem('jwt_token');
+		if (!(token == null)) {
+			const config = {
+				headers: {
+					Authorization: `Bearer ${token}`
+				}
+			};
+			await axios
+				.post('http://localhost:5555/auth/isloggedin', {}, config)
+				.then(() => {
+					loggedUser = true;
+				})
+				.catch((err) => {
+					if (err.response) {
+						message = err.response.data.error.message;
+					} else if (err.request) {
+						console.log(err.request);
+					}
+				});
+		}
 	});
+
+	async function login(e: Event) {
+		e.preventDefault();
+
+		let value: any;
+
+		try {
+			value = await loginSchema.validateAsync({
+				email: email,
+				password: password
+			});
+		} catch (error) {
+			message = error;
+			return;
+		}
+
+		await axios
+			.post('http://localhost:5555/auth/login', {
+				email: value.email,
+				password: value.password
+			})
+			.then((res) => {
+				localStorage.setItem('jwt_token', res.data.success.access_token);
+				location.reload();
+			})
+			.catch((err) => {
+				if (err.response) {
+					message = err.response.data.error.message;
+				} else if (err.request) {
+					console.log(err.request);
+				}
+			});
+	}
 </script>
 
-<div class="min-h-screen h-full w-full flex flex-col gap-12 items-center pt-52">
-	{#if !loggedUser}
-		<div class="w-full font-ms font-semibold text-2xl text-grayWhite text-center sm:text-4xl">
-			<h1 class="font-bold text-[#cbff6a]">
-				Log in<br />
-				<span class="text-grayWhite font-semibold italic">with Google:</span>
-			</h1>
-		</div>
-		<SignIn />
-	{:else}
+<div class="min-h-screen h-full w-full flex justify-center pt-52">
+	{#if loggedUser}
 		<div class="flex flex-col gap-4 items-center">
 			<h2 class="font-ms font-semibold text-xl text-grayWhite">You are already Logged In!</h2>
-			<Menu />
+		</div>
+	{:else}
+		<div
+			class="w-full flex flex-col items-center gap-12 font-ms font-semibold text-2xl text-grayWhite text-center sm:text-4xl"
+		>
+			<h1 class="font-bold text-[#cbff6a]">Log in</h1>
+			<form
+				class="flex flex-col items-center gap-6 w-4/5 max-w-xl text-xl font-medium sm:text-2xl"
+				action="POST"
+			>
+				<input
+					type="email"
+					name="email"
+					placeholder="Email"
+					class="w-full text-[#242424] outline-none rounded p-1 placeholder:text-[#969696]"
+					required
+					bind:value={email}
+				/>
+				<input
+					type="password"
+					name="password"
+					placeholder="Password"
+					class="w-full text-[#242424] outline-none rounded tracking-wider p-1 placeholder:text-[#969696]"
+					required
+					bind:value={password}
+				/>
+				<!-- svelte-ignore missing-declaration -->
+				<button
+					class="border-2 border-[#cbff6a] font-semibold px-10 py-2 rounded-md transition-colors ease-out duration-150 hover:text-[#c2ff4f]"
+					on:click={() => login(event)}
+				>
+					Login
+				</button>
+			</form>
+			<p class="text-base text-[#ff6565] sm:text-lg">{message}</p>
 		</div>
 	{/if}
 </div>

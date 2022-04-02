@@ -23,10 +23,13 @@
 		</svg>
 	</div>
 	<ul class="font-ms font-semibold text-[#A6B0C7] text-2xl text-center">
-
 		<li class="m-3"><a href="/" on:click>Home</a></li>
 
 		<li class="m-3"><a href="/login" on:click>Login</a></li>
+
+		<li class="m-3"><a href="/signup" on:click>Signup</a></li>
+
+		<li class="m-3"><a href="/account/profile" on:click>Profile</a></li>
 
 		<li class="m-3">
 			<a href="/chatroom" on:click>
