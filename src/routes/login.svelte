@@ -19,7 +19,7 @@
 				}
 			};
 			await axios
-				.post('http://api.chatapp.kominekjan.cz/auth/isloggedin', {}, config)
+				.post('https://api-chatapp-pva.herokuapp.com/auth/isloggedin', {}, config)
 				.then(() => {
 					loggedUser = true;
 				})
@@ -49,7 +49,7 @@
 		}
 
 		await axios
-			.post('http://api.chatapp.kominekjan.cz/auth/login', {
+			.post('https://api-chatapp-pva.herokuapp.com/auth/login', {
 				email: value.email,
 				password: value.password
 			})

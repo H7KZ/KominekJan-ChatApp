@@ -27,13 +27,13 @@
 		}
 
 		await axios
-			.post('http://api.chatapp.kominekjan.cz/auth/signup', {
+			.post('https://api-chatapp-pva.herokuapp.com/auth/signup', {
 				email: value.email,
 				password: value.password,
 				display_name: value.display_name
 			})
 			.then(() => {
-				location.replace('http://dev.chatapp.kominekjan.cz/verify/pending');
+				location.replace('https://production.chatappkominekjan.pages.dev/verify/pending');
 			})
 			.catch((err) => {
 				if (err.response) {
