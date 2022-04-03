@@ -33,11 +33,14 @@
 						href="/account/profile"
 						class="transition-colors ease-out duration-150 hover:text-[#c2ff4f]">Profile</a
 					>
-					<a href="/login" class="transition-colors ease-out duration-150 hover:text-[#c2ff4f]"
+					<a href="/account/login" class="transition-colors ease-out duration-150 hover:text-[#c2ff4f]"
 						>Login</a
 					>
-					<a href="/signup" class="transition-colors ease-out duration-150 hover:text-[#c2ff4f]"
+					<a href="/account/signup" class="transition-colors ease-out duration-150 hover:text-[#c2ff4f]"
 						>Signup</a
+					>
+					<a href="/account/reverify" class="transition-colors ease-out duration-150 hover:text-[#c2ff4f]"
+						>Reverify</a
 					>
 				</div>
 			</div>

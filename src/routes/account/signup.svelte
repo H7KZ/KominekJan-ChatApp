@@ -1,7 +1,7 @@
 <script lang="ts">
 	import axios from 'axios';
 
-	import signupSchema from '../components/joiSchemas/signup';
+	import signupSchema from '../../components/joiSchemas/signup';
 
 	let email: string;
 	let password: string;
@@ -93,6 +93,14 @@
 			>
 				Sign up & verify my email
 			</button>
+			<div class="text-sm sm:text-base">
+				<p>
+					Are you already registered? <a
+						href="/account/login"
+						class="text-[#cbff6a] italic underline">Log in</a
+					>
+				</p>
+			</div>
 		</form>
 		<p class="text-base text-[#ff6565] sm:text-lg">{message}</p>
 	</div>

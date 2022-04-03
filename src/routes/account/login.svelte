@@ -3,7 +3,7 @@
 
 	import axios from 'axios';
 
-	import loginSchema from '../components/joiSchemas/login';
+	import loginSchema from '../../components/joiSchemas/login';
 
 	let loggedUser: boolean = false;
 	let email: string;
@@ -104,6 +104,14 @@
 				>
 					Login
 				</button>
+				<div class="text-sm sm:text-base">
+					<p>
+						You are not registered yet? <a
+							href="/account/signup"
+							class="text-[#cbff6a] italic underline">Create an account</a
+						>
+					</p>
+				</div>
 			</form>
 			<p class="text-base text-[#ff6565] sm:text-lg">{message}</p>
 		</div>
