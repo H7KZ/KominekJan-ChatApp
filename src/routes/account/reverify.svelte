@@ -33,7 +33,7 @@
 		}
 	});
 
-	async function login(e: Event) {
+	async function reverify(e: Event) {
 		e.preventDefault();
 
 		let value: any;
@@ -101,7 +101,7 @@
 				<!-- svelte-ignore missing-declaration -->
 				<button
 					class="border-2 border-[#cbff6a] font-semibold px-10 py-2 rounded-md transition-colors ease-out duration-150 hover:text-[#c2ff4f]"
-					on:click={() => login(event)}
+					on:click={() => reverify(event)}
 				>
 					Send re-verification code
 				</button>
