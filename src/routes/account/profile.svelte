@@ -3,7 +3,8 @@
 
 	import axios from 'axios';
 
-	let loggedUser: boolean = false;
+	let loggedUser: boolean;
+	let display: boolean = false;
 	let message: string = '';
 
 	onMount(async () => {
@@ -17,9 +18,12 @@
 			await axios
 				.post('https://api-chatapp-pva.herokuapp.com/auth/isloggedin', {}, config)
 				.then(() => {
+					display = true;
 					loggedUser = true;
 				})
 				.catch((err) => {
+					display = true;
+					loggedUser = false;
 					if (err.response) {
 						message = err.response.data.error.message;
 					} else if (err.request) {
@@ -38,7 +42,7 @@
 </script>
 
 <div class="min-h-screen h-full w-full flex justify-center pt-52">
-	{#if loggedUser}
+	{#if loggedUser && display}
 		<div
 			class="w-full flex flex-col items-center gap-12 font-ms font-semibold text-2xl text-grayWhite text-center sm:text-4xl"
 		>
@@ -51,7 +55,7 @@
 				Logout
 			</button>
 		</div>
-	{:else}
+	{:else if !loggedUser && display}
 		<div class="flex flex-col gap-10 items-center text-grayWhite text-xl font-semibold sm:text-2xl">
 			<h2 class="font-ms text-2xl">You need to be logged in to see your account!</h2>
 			<a href="/login">

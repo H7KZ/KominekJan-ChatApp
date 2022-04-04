@@ -5,7 +5,8 @@
 
 	import loginSchema from '../../components/joiSchemas/login';
 
-	let loggedUser: boolean = false;
+	let loggedUser: boolean;
+	let display: boolean = false;
 	let email: string;
 	let password: string;
 	let message: string = '';
@@ -21,9 +22,12 @@
 			await axios
 				.post('https://api-chatapp-pva.herokuapp.com/auth/isloggedin', {}, config)
 				.then(() => {
+					display = true;
 					loggedUser = true;
 				})
 				.catch((err) => {
+					display = true;
+					loggedUser = false;
 					if (err.response) {
 						message = err.response.data.error.message;
 					} else if (err.request) {
@@ -68,11 +72,11 @@
 </script>
 
 <div class="min-h-screen h-full w-full flex justify-center pt-52">
-	{#if loggedUser}
+	{#if loggedUser && display}
 		<div class="flex flex-col gap-4 items-center">
 			<h2 class="font-ms font-semibold text-xl text-grayWhite">You are already Logged In!</h2>
 		</div>
-	{:else}
+	{:else if !loggedUser && display}
 		<div
 			class="w-full flex flex-col items-center gap-12 font-ms font-semibold text-2xl text-grayWhite text-center sm:text-4xl"
 		>
