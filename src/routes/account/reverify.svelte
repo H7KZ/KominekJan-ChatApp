@@ -80,7 +80,7 @@
 				You are already Logged In / Verified!
 			</h2>
 		</div>
-	{:else if loggedUser && display}
+	{:else if !loggedUser && display}
 		<div
 			class="w-full flex flex-col items-center gap-12 font-ms font-semibold text-2xl text-grayWhite text-center sm:text-4xl"
 		>
