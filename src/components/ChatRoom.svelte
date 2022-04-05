@@ -231,22 +231,22 @@
 	//CHECKING LENGTH OF MESSAGE
 
 	let showChars = false;
-	let charsCount = 751;
+	let charsCount = 45000;
 
 	function checkChars(e) {
 		e.preventDefault();
 
-		if (messageText.length > 751) {
+		if (messageText.length > 45000) {
 			showChars = true;
-			charsCount = 751 - messageText.length;
+			charsCount = 45000 - messageText.length;
 			return;
-		} else if (messageText.length > 351 && !(messageText.indexOf(' ') !== -1)) {
+		} else if (messageText.length > 20000 && !(messageText.indexOf(' ') !== -1)) {
 			showChars = true;
-			charsCount = charsCount = 351 - messageText.length;
+			charsCount = charsCount = 20000 - messageText.length;
 			return;
 		} else {
 			showChars = false;
-			charsCount = 751 - messageText.length;
+			charsCount = 45000 - messageText.length;
 			return;
 		}
 	}
