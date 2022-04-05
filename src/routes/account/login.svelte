@@ -36,6 +36,7 @@
 				});
 		} else {
 			display = true;
+			loggedUser = false;
 		}
 	});
 
