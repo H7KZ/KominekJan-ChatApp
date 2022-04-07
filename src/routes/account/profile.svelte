@@ -25,6 +25,7 @@
 				.then(() => {
 					display = true;
 					loggedUser = true;
+					message = '';
 				})
 				.catch((err) => {
 					display = true;

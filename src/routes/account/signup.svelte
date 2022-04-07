@@ -35,6 +35,7 @@
 				display_name: value.display_name
 			})
 			.then(() => {
+				message = '';
 				location.replace('https://production.chatappkominekjan.pages.dev/verify/pending');
 			})
 			.catch((err) => {
