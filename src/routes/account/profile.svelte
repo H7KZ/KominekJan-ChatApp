@@ -1,4 +1,6 @@
 <script lang="ts">
+	import Menu from '/src/components/common/Menu.svelte';
+
 	import { onMount } from 'svelte';
 
 	import axios from 'axios';
@@ -15,6 +17,9 @@
 					Authorization: `Bearer ${token}`
 				}
 			};
+
+			message = 'loading . . .';
+
 			await axios
 				.post('https://api-chatapp-pva.herokuapp.com/auth/isloggedin', {}, config)
 				.then(() => {
@@ -44,7 +49,7 @@
 	}
 </script>
 
-<div class="min-h-screen h-full w-full flex justify-center pt-52">
+<div class="min-h-screen h-full w-full flex justify-center items-center">
 	{#if loggedUser && display}
 		<div
 			class="w-full flex flex-col items-center gap-12 font-ms font-semibold text-2xl text-grayWhite text-center sm:text-4xl"
@@ -61,20 +66,7 @@
 	{:else if !loggedUser && display}
 		<div class="flex flex-col gap-10 items-center text-grayWhite text-xl font-semibold sm:text-2xl">
 			<h2 class="font-ms text-2xl">You need to be logged in to see your account!</h2>
-			<a href="/login">
-				<button
-					class="border-2 border-[#cbff6a] font-semibold px-10 py-2 rounded-md transition-colors ease-out duration-150 hover:text-[#c2ff4f]"
-				>
-					Log in here
-				</button>
-			</a>
-			<a href="/signup">
-				<button
-					class="border-2 border-[#cbff6a] font-semibold px-10 py-2 rounded-md transition-colors ease-out duration-150 hover:text-[#c2ff4f]"
-				>
-					Sign up here
-				</button>
-			</a>
+			<Menu />
 			<p class="text-base text-[#ff6565] sm:text-lg">{message}</p>
 		</div>
 	{/if}

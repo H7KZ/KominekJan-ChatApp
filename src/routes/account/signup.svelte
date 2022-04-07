@@ -26,6 +26,8 @@
 			return;
 		}
 
+		message = 'loading . . .';
+
 		await axios
 			.post('https://api-chatapp-pva.herokuapp.com/auth/signup', {
 				email: value.email,
@@ -45,7 +47,7 @@
 	}
 </script>
 
-<div class="min-h-screen h-full w-full flex justify-center pt-52">
+<div class="min-h-screen h-full w-full flex justify-center items-center">
 	<div
 		class="w-full flex flex-col items-center gap-12 font-ms font-semibold text-2xl text-grayWhite text-center sm:text-4xl"
 	>

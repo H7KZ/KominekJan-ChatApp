@@ -19,6 +19,9 @@
 					Authorization: `Bearer ${token}`
 				}
 			};
+
+			message = 'loading . . .';
+
 			await axios
 				.post('https://api-chatapp-pva.herokuapp.com/auth/isloggedin', {}, config)
 				.then(() => {
@@ -55,6 +58,8 @@
 			return;
 		}
 
+		message = 'loading . . .';
+
 		await axios
 			.post('https://api-chatapp-pva.herokuapp.com/auth/login', {
 				email: value.email,
@@ -74,7 +79,7 @@
 	}
 </script>
 
-<div class="min-h-screen h-full w-full flex justify-center pt-52">
+<div class="min-h-screen h-full w-full flex justify-center items-center">
 	{#if loggedUser && display}
 		<div class="flex flex-col gap-4 items-center">
 			<h2 class="font-ms font-semibold text-xl text-grayWhite">You are already Logged In!</h2>
