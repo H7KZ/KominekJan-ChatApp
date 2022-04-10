@@ -58,6 +58,10 @@
 			time: Date.now()
 		}
 	];
+
+	function sendMessage() {
+		//TODO: SEND MESSAGE TO SERVER, VALIDATE, RETURN RESPONSE, HANDLE, DISPLAY
+	}
 </script>
 
 <div class="min-h-screen h-full w-full flex justify-center items-center">
