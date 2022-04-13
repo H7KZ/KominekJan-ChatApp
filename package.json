@@ -22,6 +22,7 @@
     "type": "module",
     "dependencies": {
         "axios": "^0.26.1",
-        "joi": "^17.6.0"
+        "joi": "^17.6.0",
+        "socket.io-client": "^4.4.1"
     }
 }

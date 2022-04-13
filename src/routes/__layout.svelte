@@ -4,7 +4,7 @@
 	import '/src/tailwind/tailwind.css';
 </script>
 
-<div>
+<div class="h-full w-full">
 	<Navbar />
 	<slot />
 </div>

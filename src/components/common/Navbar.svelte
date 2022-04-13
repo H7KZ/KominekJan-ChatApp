@@ -7,7 +7,7 @@
 </script>
 
 <div
-	class="w-full h-16 fixed flex flex-row items-center p-2 md:px-8 md:py-4 lg:px-32 lg:py-8 xl:px-48 lx:py-12 bg-[#161616] bg-opacity-70"
+	class="w-full h-16 fixed flex flex-row items-center p-2 md:px-8 md:py-4 lg:px-32 lg:py-8 xl:px-48 lx:py-12 bg-[#161616] bg-opacity-70 z-50"
 >
 	<div class="w-full hidden md:flex flex-row items-center justify-between font-ms text-[#eaf2ff]">
 		<div class="font-bold text-grayWhite text-2xl uppercase">
