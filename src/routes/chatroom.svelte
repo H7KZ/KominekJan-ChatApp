@@ -10,13 +10,22 @@
 
 	//VARIABLES
 
+	const wait = (timeToDelay: number) =>
+		new Promise((resolve) => setTimeout(resolve, timeToDelay));
+
 	const socket = io("http://localhost:5555/");
 
 	let messages = [];
 
-	socket.on("messages", (messagesList) => {
+	socket.on("messages", async (messagesList) => {
 		messages = messagesList;
 	});
+
+	socket.on("messageError", (error) => {
+		message = error;
+	});
+
+	let canSend: boolean = true;
 
 	let loggedUser: boolean;
 	let display: boolean = false;
@@ -29,34 +38,34 @@
 	let rooms = [
 		{
 			name: "General 🏝️",
-			id: 1,
+			id: 0,
 		},
 		{
-			name: "Coming soon...",
+			name: "Not coming soon. . .",
+			id: 1,
 		},
 	];
+
+	let activeRoom = rooms[0];
+
+	let messagesContainer: Element;
 
 	//ON MOUNT
 
 	onMount(async () => {
-
 		//GET LOGGED USER
 		const token = localStorage.getItem("jwt_token");
 		if (!(token == null)) {
 			const config = {
 				headers: {
-					Authorization: `Bearer ${token}`,
+					authorization: `Bearer ${token}`,
 				},
 			};
 
 			message = "loading . . .";
 
 			await axios
-				.post(
-					"https://api-chatapp-pva.herokuapp.com/auth/isloggedin",
-					{},
-					config
-				)
+				.post("http://localhost:5555/auth/isloggedin", {}, config)
 				.then(() => {
 					display = true;
 					loggedUser = true;
@@ -87,23 +96,82 @@
 				sidebar = true;
 			}
 		});
+
+		while (messagesContainer.scrollTop != messagesContainer.scrollHeight) {
+			await wait(1000);
+			messagesContainer.scrollTop = messagesContainer.scrollHeight;
+			break;
+		}
 	});
 
 	//FUNCTIONS
 
-	function sendMessage() {
-		//TODO: SEND MESSAGE TO SERVER, VALIDATE, RETURN RESPONSE, HANDLE ERRORS
+	let messageBox: string;
+
+	let statusMessage: string = "👍 You can send a message";
+	let statusColor: string = "text-[#c6ff5b]";
+
+	async function sendMessage(e: Event) {
+		e.preventDefault();
+
+		if (canSend) {
+			statusMessage = "🚸 Sending . . .";
+			statusColor = "text-[#f5c842]";
+
+			const token = localStorage.getItem("jwt_token");
+			if (!(token == null)) {
+				const config = {
+					headers: {
+						authorization: `Bearer ${token}`,
+					},
+				};
+
+				await axios
+					.post(
+						"http://localhost:5555/message/send",
+						{
+							message: messageBox,
+						},
+						config
+					)
+					.then(async () => {
+						messageBox = "";
+						statusMessage = "✔️ Message sent!";
+						statusColor = "text-[#c6ff5b]";
+						timeout();
+					})
+					.catch(async (err) => {
+						statusMessage = "⛔ " + err.response.data.error.message;
+						statusColor = "text-[#ff6565]";
+						await wait(15000);
+						statusMessage = "👍 You can send another message";
+					});
+			}
+		} else {
+			statusMessage = "⛔ You can't send another message! Wait 10s!";
+			statusColor = "text-[#ff6565]";
+		}
+	}
+
+	async function timeout() {
+		canSend = false;
+		statusMessage = "⛔ Wait 10s before sending another message";
+		statusColor = "text-[#ff6565]";
+		await wait(10000);
+		canSend = true;
+		statusMessage = "👍 You can send another message";
+		statusColor = "text-[#c6ff5b]";
 	}
 </script>
 
 <!--HTML-->
 <div class="min-h-screen h-screen w-full flex justify-center items-center">
-	{#if true && display}
-	<!--MESSAGES-->
+	{#if loggedUser && display}
+		<!--MESSAGES-->
 		<div
 			class="h-3/4 w-full flex justify-center items-center font-ms px-4 sm:px-16"
 		>
-		<!--SIDEBAR OF ROOMS-->
+			<!--SIDEBAR OF ROOMS-->
 			{#if sidebar}
 				<div class="h-full w-60 bg-[#222222] flex-shrink-0 z-20">
 					<div class="flex flex-col items-start gap-2 py-2 px-4">
@@ -124,7 +192,7 @@
 			<div
 				class="h-full w-full max-w-6xl flex flex-col gap-4 justify-between items-center"
 			>
-			<!--CHATROOM HEADER-->
+				<!--CHATROOM HEADER-->
 				<div
 					class="w-full flex items-center gap-2 pl-2 h-12 bg-[#222222] text-grayWhite flex-shrink-0"
 				>
@@ -155,12 +223,13 @@
 					</div>
 					<h2>
 						<span class="italic">#</span>
-						General 🏝️
+						{activeRoom.name}
 					</h2>
 				</div>
 				<!--DISPLAY MESSAGES-->
 				<div
 					class="w-full h-full overflow-y-scroll overflow-x-clip scroll-smooth custom-scrollbar md:pl-4"
+					bind:this={messagesContainer}
 				>
 					<!--DISPLAYING MESSAGES-->
 					{#each messages as message}
@@ -168,7 +237,7 @@
 							<div class="shrink-0 w-12">
 								<div class="relative w-full h-10 sm:h-12">
 									<img
-										src={message.photoURL == ""
+										src={message.photoURL == "" || message.photoURL == null
 											? "default_pfp.png"
 											: message.photoURL}
 										alt="err"
@@ -187,10 +256,10 @@
 							<div class="flex flex-col w-full">
 								<div>
 									<h2 class="text-sm text-[#c6ff5be7] sm:text-base">
-										{message.name}
+										{message.user.display_name}
 										&nbsp;&nbsp;&nbsp;
 										<span class="text-xs text-[#9e9e9e]">
-											{message.time}
+											{new Date(message.createdAt).toLocaleString()}
 										</span>
 									</h2>
 								</div>
@@ -206,10 +275,15 @@
 					<div class="w-full h-20 flex items-start gap-2">
 						<textarea
 							name="messageBox"
-							class="resize-none w-full h-full bg-[#222222] border-2 border-[#b9ec5a] rounded-md outline-none px-2 py-1 text-grayWhite"
+							class="resize-none w-full h-full bg-[#222222] border-2 border-[#b9ec5a] text-sm md:text-base rounded-md outline-none px-2 py-1 text-grayWhite"
 							placeholder="Type your message..."
+							bind:value={messageBox}
 						/>
-						<button class="h-full border-2 border-[#c6ff5be7] rounded-md">
+						<!-- svelte-ignore missing-declaration -->
+						<button
+							class="h-full border-2 border-[#c6ff5be7] rounded-md w-20 flex items-center justify-center"
+							on:click={() => sendMessage(event)}
+						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								viewBox="0 0 24 24"
@@ -221,14 +295,18 @@
 							>
 						</button>
 					</div>
-					<p class="text-xs text-[#ff5f5f] {message ? 'visible' : 'invisible'} md:text-sm">
-						⛔ {message}
+					<p
+						class="text-xs {statusColor} {statusMessage
+							? 'visible'
+							: 'invisible'} md:text-sm"
+					>
+						{statusMessage}
 					</p>
 				</div>
 			</div>
 		</div>
 	{:else if !loggedUser && display}
-	<!--YOU ARE NOT LOGGED IN-->
+		<!--YOU ARE NOT LOGGED IN-->
 		<div
 			class="flex flex-col gap-10 items-center text-grayWhite text-xl font-semibold sm:text-2xl"
 		>
