@@ -187,7 +187,7 @@
 	{#if loggedUser && display}
 		<!--MESSAGES-->
 		<div
-			class="h-3/4 w-full flex justify-center items-center font-ms px-4 sm:px-16"
+			class="h-3/4 w-full flex justify-center items-center font-ms px-4 overflow-x-hidden sm:px-16"
 		>
 			<!--SIDEBAR OF ROOMS-->
 			{#if sidebar}
@@ -209,7 +209,7 @@
 
 			<!--CHATROOM-->
 			<div
-				class="h-full w-full max-w-6xl flex flex-col gap-4 justify-between items-center"
+				class="h-full w-full max-w-6xl flex flex-col gap-4 justify-between items-center md:w-4/5"
 			>
 				<!--CHATROOM HEADER-->
 				<div
@@ -254,7 +254,7 @@
 					<!--DISPLAYING MESSAGES-->
 					{#each messages as message}
 						<div class="flex gap-2 text-grayWhite mt-3 w-full">
-							<div class="shrink-0 w-12">
+							<div class="flex-shrink-0 w-12">
 								<div class="relative w-full h-10 sm:h-12">
 									<img
 										src={message.photoURL == "" || message.photoURL == null
@@ -274,8 +274,8 @@
 							</div>
 
 							<div class="flex flex-col w-full">
-								<div>
-									<h2 class="text-sm text-[#c6ff5be7] sm:text-base">
+								<div class="w-5/6">
+									<h2 class="text-sm text-[#c6ff5be7] sm:text-base m-0">
 										{message.user.display_name}
 										&nbsp;&nbsp;&nbsp;
 										<span class="text-xs text-[#9e9e9e]">
