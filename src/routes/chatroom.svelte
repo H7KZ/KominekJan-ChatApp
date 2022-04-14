@@ -13,7 +13,7 @@
 	const wait = (timeToDelay: number) =>
 		new Promise((resolve) => setTimeout(resolve, timeToDelay));
 
-	const socket = io("http://localhost:5555/");
+	const socket = io("https://api-chatapp-pva.herokuapp.com/");
 
 	let messages = [];
 
@@ -41,9 +41,21 @@
 			id: 0,
 		},
 		{
-			name: "Not coming soon. . .",
+			name: "Programming 💻",
 			id: 1,
 		},
+		{
+			name: "Gaming 🎮",
+			id: 2,
+		},
+		{
+			name: "Music 🎵",
+			id: 3,
+		},
+		{
+			name: "Sports 🏀",
+			id: 4,
+		}
 	];
 
 	let activeRoom = rooms[0];
@@ -65,7 +77,7 @@
 			message = "loading . . .";
 
 			await axios
-				.post("http://localhost:5555/auth/isloggedin", {}, config)
+				.post("https://api-chatapp-pva.herokuapp.com/auth/isloggedin", {}, config)
 				.then(() => {
 					display = true;
 					loggedUser = true;
@@ -128,9 +140,10 @@
 
 				await axios
 					.post(
-						"http://localhost:5555/message/send",
+						"https://api-chatapp-pva.herokuapp.com/message/send",
 						{
 							message: messageBox,
+							room_id: activeRoom.id,
 						},
 						config
 					)
@@ -162,6 +175,11 @@
 		statusMessage = "👍 You can send another message";
 		statusColor = "text-[#c6ff5b]";
 	}
+
+	function switchRooms(room: { name: string; id: number; }) {
+		activeRoom = room;
+		socket.emit("switchRoom", activeRoom.id.toString());
+	}
 </script>
 
 <!--HTML-->
@@ -179,6 +197,7 @@
 						{#each rooms as room}
 							<button
 								class="text-grayWhite h-full w-full text-left bg-[#444444] rounded-lg pl-2"
+								on:click={() => switchRooms(room)}
 							>
 								<span class="italic">#</span>
 								{room.name}
@@ -214,6 +233,7 @@
 							{#each rooms as room}
 								<button
 									class="text-grayWhite h-full w-full text-left bg-[#444444] rounded-lg pl-2"
+									on:click={() => switchRooms(room)}
 								>
 									<span class="italic">#</span>
 									{room.name}
