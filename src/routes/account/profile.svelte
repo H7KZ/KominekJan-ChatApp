@@ -96,7 +96,7 @@
 
 			await axios
 				.post(
-					"http://localhost:5555/profile/changeUserData",
+					"https://api-chatapp-pva.herokuapp.com/profile/changeUserData",
 					{
 						photoURL: newPFP,
 						display_name: newDisplayName,

@@ -155,7 +155,7 @@
 
 				await axios
 					.post(
-						"http://localhost:5555/message/send",
+						"https://api-chatapp-pva.herokuapp.com/message/send",
 						{
 							message: messageBox,
 							room_id: activeRoom.id,
