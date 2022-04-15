@@ -17,19 +17,10 @@
 
 	let messages = [];
 
-	socket.on("messages", async (messagesList) => {
-		messages = messagesList;
-	});
-
-	socket.on("messageError", (error) => {
-		message = error;
-	});
-
 	let canSend: boolean = true;
 
 	let loggedUser: boolean;
 	let display: boolean = false;
-	let message: string = "";
 
 	let sidebar: boolean;
 
@@ -74,20 +65,20 @@
 				},
 			};
 
-			message = "loading . . .";
+			statusMessage = "loading . . .";
 
 			await axios
 				.post("https://api-chatapp-pva.herokuapp.com/auth/isloggedin", {}, config)
 				.then(() => {
 					display = true;
 					loggedUser = true;
-					message = "";
+					statusMessage = "";
 				})
 				.catch((err) => {
 					display = true;
 					loggedUser = false;
 					if (err.response) {
-						message = err.response.data.error.message;
+						statusMessage = err.response.data.error.message;
 					} else if (err.request) {
 						console.log(err.request);
 					}
@@ -96,6 +87,15 @@
 			display = true;
 			loggedUser = false;
 		}
+
+		socket.on("messages", (messagesList) => {
+			messages = messagesList;
+			messagesContainer.scrollTop = messagesContainer.scrollHeight;
+		});
+
+		socket.on("messageError", (error) => {
+			statusMessage = error;
+		});
 
 		//SIDEBAR CHATROOM
 		sidebar = window.innerWidth < 768 ? false : true;
@@ -126,6 +126,21 @@
 	async function sendMessage(e: Event) {
 		e.preventDefault();
 
+		//VALIDATE MESSAGE
+
+		if (messageBox.trim() == "" || messageBox == null || messageBox == undefined) {
+			statusMessage = "⛔ You can't send an empty message";
+			statusColor = "text-[#ff5b5b]";
+			return;
+		}
+
+		if (messageBox.length > 500) {
+			statusMessage = "⛔ You can't send a message longer than 500 characters. You are over " + (messageBox.length - 500) + " characters";
+			statusColor = "text-[#ff5b5b]";
+			return;
+		}
+
+		//IS READY TO SEND
 		if (canSend) {
 			statusMessage = "🚸 Sending . . .";
 			statusColor = "text-[#f5c842]";
@@ -156,7 +171,7 @@
 					.catch(async (err) => {
 						statusMessage = "⛔ " + err.response.data.error.message;
 						statusColor = "text-[#ff6565]";
-						await wait(15000);
+						await wait(8000);
 						statusMessage = "👍 You can send another message";
 					});
 			}
@@ -168,17 +183,19 @@
 
 	async function timeout() {
 		canSend = false;
-		statusMessage = "⛔ Wait 10s before sending another message";
+		statusMessage = "⛔ Wait 5s before sending another message";
 		statusColor = "text-[#ff6565]";
-		await wait(10000);
+		await wait(5000);
 		canSend = true;
 		statusMessage = "👍 You can send another message";
 		statusColor = "text-[#c6ff5b]";
 	}
 
-	function switchRooms(room: { name: string; id: number; }) {
+	async function switchRooms(room: { name: string; id: number; }) {
 		activeRoom = room;
 		socket.emit("switchRoom", activeRoom.id.toString());
+		await wait(500);
+		messagesContainer.scrollTop = messagesContainer.scrollHeight;
 	}
 </script>
 
@@ -257,11 +274,11 @@
 							<div class="flex-shrink-0 w-12">
 								<div class="relative w-full h-10 sm:h-12">
 									<img
-										src={message.photoURL == "" || message.photoURL == null
+										src={message.photoURL == "" || message.photoURL == null || message.photoURL == undefined
 											? "default_pfp.png"
 											: message.photoURL}
-										alt="err"
-										class="rounded-full w-10 sm:w-12"
+										alt="PFP"
+										class="rounded-full w-10 h-10 origin-center sm:w-12 sm:h-12"
 									/>
 									<img
 										src={message.badge}
@@ -334,7 +351,7 @@
 				You need to be logged in to chat! u moron
 			</h2>
 			<Menu />
-			<p class="text-base text-[#ff6565] sm:text-lg">{message}</p>
+			<p class="text-base text-[#ff6565] sm:text-lg">{statusMessage}</p>
 		</div>
 	{/if}
 </div>
