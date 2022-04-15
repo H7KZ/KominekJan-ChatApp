@@ -73,6 +73,7 @@
 					display = true;
 					loggedUser = true;
 					statusMessage = "";
+					socket.emit("join");
 				})
 				.catch((err) => {
 					display = true;
