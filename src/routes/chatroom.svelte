@@ -155,7 +155,7 @@
 
 				await axios
 					.post(
-						"https://api-chatapp-pva.herokuapp.com/message/send",
+						"http://localhost:5555/message/send",
 						{
 							message: messageBox,
 							room_id: activeRoom.id,
@@ -196,6 +196,14 @@
 		socket.emit("switchRoom", activeRoom.id.toString());
 		await wait(500);
 		messagesContainer.scrollTop = messagesContainer.scrollHeight;
+	}
+
+	function getPFP(pfp: string) {
+		if (pfp == null || pfp == undefined || pfp == "") {
+			return "default_pfp.png";
+		} else {
+			return pfp;
+		}
 	}
 </script>
 
@@ -274,9 +282,7 @@
 							<div class="flex-shrink-0 w-12">
 								<div class="relative w-full h-10 sm:h-12">
 									<img
-										src={message.photoURL == "" || message.photoURL == null || message.photoURL == undefined
-											? "default_pfp.png"
-											: message.photoURL}
+										src={getPFP(message.user.photoURL)}
 										alt="PFP"
 										class="rounded-full w-10 h-10 origin-center sm:w-12 sm:h-12"
 									/>
