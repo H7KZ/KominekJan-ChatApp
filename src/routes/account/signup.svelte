@@ -7,7 +7,8 @@
 	let password: string;
 	let confirmPassword: string;
 	let display_name: string;
-	let message: string = '';
+
+	let messageStatus: string = "";
 
 	async function signup(e: Event) {
 		e.preventDefault();
@@ -22,11 +23,11 @@
 				display_name: display_name
 			});
 		} catch (error) {
-			message = error;
+			messageStatus = error;
 			return;
 		}
 
-		message = 'loading . . .';
+		messageStatus = 'loading . . .';
 
 		await axios
 			.post('https://api-chatapp-pva.herokuapp.com/auth/signup', {
@@ -35,12 +36,12 @@
 				display_name: value.display_name
 			})
 			.then(() => {
-				message = '';
+				messageStatus = '';
 				location.replace('https://production.chatappkominekjan.pages.dev/verify/pending');
 			})
 			.catch((err) => {
 				if (err.response) {
-					message = err.response.data.error.message;
+					messageStatus = err.response.data.error.message;
 				} else if (err.request) {
 					console.log(err.request);
 				}
@@ -105,6 +106,6 @@
 				</p>
 			</div>
 		</form>
-		<p class="text-base text-[#ff6565] sm:text-lg">{message}</p>
+		<p class="text-base text-[#ff6565] sm:text-lg">{messageStatus}</p>
 	</div>
 </div>

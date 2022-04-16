@@ -6,7 +6,8 @@
 
 	let loggedUser: boolean;
 	let display: boolean = false;
-	let message: string = '';
+
+	let messageStatus: string = "";
 
 	onMount(async () => {
 		const token = localStorage.getItem('jwt_token');
@@ -17,20 +18,20 @@
 				}
 			};
 
-			message = 'loading . . .';
+			messageStatus = 'loading . . .';
 
 			await axios
 				.post('https://api-chatapp-pva.herokuapp.com/auth/isloggedin', {}, config)
 				.then(() => {
 					display = true;
 					loggedUser = true;
-					message = '';
+					messageStatus = '';
 				})
 				.catch((err) => {
 					display = true;
 					loggedUser = false;
 					if (err.response) {
-						message = err.response.data.error.message;
+						messageStatus = err.response.data.error.message;
 					} else if (err.request) {
 						console.log(err.request);
 					}
@@ -61,6 +62,6 @@
 		{:else if !loggedUser && display}
 			<Menu />
 		{/if}
-		<p class="text-base text-[#ff6565] sm:text-lg">{message}</p>
+		<p class="text-base text-[#ff6565] sm:text-lg">{messageStatus}</p>
 	</div>
 </div>

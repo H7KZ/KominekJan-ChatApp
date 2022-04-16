@@ -53,6 +53,9 @@
 
 	let messagesContainer: Element;
 
+	let messageStatus: string = "";
+	let statusColor: string = "";
+
 	//ON MOUNT
 
 	onMount(async () => {
@@ -65,20 +68,23 @@
 				},
 			};
 
-			statusMessage = "loading . . .";
+			messageStatus = "loading . . .";
+			statusColor = "text-[#f5c842]";
 
 			await axios
 				.post("https://api-chatapp-pva.herokuapp.com/auth/isloggedin", {}, config)
 				.then(() => {
 					display = true;
 					loggedUser = true;
-					statusMessage = "";
+					messageStatus = "👍 You can send a message";
+					statusColor = "text-[#c6ff5b]";
 				})
 				.catch((err) => {
 					display = true;
 					loggedUser = false;
 					if (err.response) {
-						statusMessage = err.response.data.error.message;
+						messageStatus = err.response.data.error.message;
+						statusColor = "text-[#ff5b5b]";
 					} else if (err.request) {
 						console.log(err.request);
 					}
@@ -94,7 +100,8 @@
 		});
 
 		socket.on("messageError", (error) => {
-			statusMessage = error;
+			messageStatus = error;
+			statusColor = "text-[#ff5b5b]";
 		});
 
 		//SIDEBAR CHATROOM
@@ -120,29 +127,26 @@
 
 	let messageBox: string;
 
-	let statusMessage: string = "👍 You can send a message";
-	let statusColor: string = "text-[#c6ff5b]";
-
 	async function sendMessage(e: Event) {
 		e.preventDefault();
 
 		//VALIDATE MESSAGE
 
 		if (messageBox.trim() == "" || messageBox == null || messageBox == undefined) {
-			statusMessage = "⛔ You can't send an empty message";
+			messageStatus = "⛔ You can't send an empty message";
 			statusColor = "text-[#ff5b5b]";
 			return;
 		}
 
 		if (messageBox.length > 500) {
-			statusMessage = "⛔ You can't send a message longer than 500 characters. You are over " + (messageBox.length - 500) + " characters";
+			messageStatus = "⛔ You can't send a message longer than 500 characters. You are over " + (messageBox.length - 500) + " characters";
 			statusColor = "text-[#ff5b5b]";
 			return;
 		}
 
 		//IS READY TO SEND
 		if (canSend) {
-			statusMessage = "🚸 Sending . . .";
+			messageStatus = "🚸 Sending . . .";
 			statusColor = "text-[#f5c842]";
 
 			const token = localStorage.getItem("jwt_token");
@@ -164,30 +168,30 @@
 					)
 					.then(async () => {
 						messageBox = "";
-						statusMessage = "✔️ Message sent!";
+						messageStatus = "✔️ Message sent!";
 						statusColor = "text-[#c6ff5b]";
 						timeout();
 					})
 					.catch(async (err) => {
-						statusMessage = "⛔ " + err.response.data.error.message;
+						messageStatus = "⛔ " + err.response.data.error.message;
 						statusColor = "text-[#ff6565]";
 						await wait(8000);
-						statusMessage = "👍 You can send another message";
+						messageStatus = "👍 You can send another message";
 					});
 			}
 		} else {
-			statusMessage = "⛔ You can't send another message! Wait 10s!";
+			messageStatus = "⛔ You can't send another message! Wait 10s!";
 			statusColor = "text-[#ff6565]";
 		}
 	}
 
 	async function timeout() {
 		canSend = false;
-		statusMessage = "⛔ Wait 5s before sending another message";
+		messageStatus = "⛔ Wait 5s before sending another message";
 		statusColor = "text-[#ff6565]";
 		await wait(5000);
 		canSend = true;
-		statusMessage = "👍 You can send another message";
+		messageStatus = "👍 You can send another message";
 		statusColor = "text-[#c6ff5b]";
 	}
 
@@ -339,11 +343,9 @@
 						</button>
 					</div>
 					<p
-						class="text-xs {statusColor} {statusMessage
-							? 'visible'
-							: 'invisible'} md:text-sm"
+						class="text-xs {statusColor} md:text-sm"
 					>
-						{statusMessage}
+						{messageStatus}
 					</p>
 				</div>
 			</div>
@@ -357,7 +359,7 @@
 				You need to be logged in to chat! u moron
 			</h2>
 			<Menu />
-			<p class="text-base text-[#ff6565] sm:text-lg">{statusMessage}</p>
+			<p class="text-base text-[#ff6565] sm:text-lg">{messageStatus}</p>
 		</div>
 	{/if}
 </div>
