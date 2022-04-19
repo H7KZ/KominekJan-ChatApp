@@ -130,6 +130,9 @@
 				class="w-full flex flex-col items-center gap-2 text-xl text-grayWhite text-center font-semibold sm:text-2xl"
 			>
 				<h3 class="">{userData.email}</h3>
+				<h4 class="text-base text-[#c5c5c5] sm:text-lg">
+					Account created at: {new Date(userData.created).toLocaleString()}
+				</h4>
 			</div>
 			<div
 				class="w-full flex flex-col items-center gap-2 text-xl text-grayWhite text-center font-semibold sm:text-2xl"
@@ -137,34 +140,31 @@
 				<div class="relative">
 					{#if userDataLoaded}
 						<!-- svelte-ignore a11y-missing-attribute -->
-						<img
-							src={userData.photoURL}
-							class="rounded-full w-20 h-20 sm:w-28 sm:h-28 origin-center"
-						/>
+						<center>
+							<img
+								src={userData.photoURL}
+								class="rounded-full w-20 h-20 origin-center object-cover sm:w-28 sm:h-28"
+							/>
+						</center>
 					{/if}
 
 					<div
 						class="absolute top-0 left-0 flex justify-center items-center rounded-full w-20 h-20 sm:w-28 sm:h-28 origin-center bg-[#0000008c]"
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							viewBox="0 0 24 24"
-							style="fill: #dedede;"
-							class="w-6 sm:w-10"
-							><path
-								d="M20 5h-2.586l-2.707-2.707A.996.996 0 0 0 14 2h-4a.996.996 0 0 0-.707.293L6.586 5H4c-1.103 0-2 .897-2 2v11c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V7c0-1.103-.897-2-2-2zm-8 12c-2.71 0-5-2.29-5-5 0-2.711 2.29-5 5-5s5 2.289 5 5c0 2.71-2.29 5-5 5z"
-							/><path d="M13 9h-2v2H9v2h2v2h2v-2h2v-2h-2z" /></svg
-						>
-					</div>
+					/>
 				</div>
 				<h3 class="">Change your profile picture</h3>
-				<div class="w-5/6 max-w-md text-lg font-medium sm:text-xl">
+				<div
+					class="flex flex-col gap-1 w-5/6 max-w-md text-lg font-medium sm:text-xl"
+				>
 					<input
 						type="text"
 						placeholder={userData.photoURL}
 						class="w-full text-[#242424] outline-none rounded p-1 placeholder:text-[#969696]"
 						bind:value={newPFP}
 					/>
+					<p class="text-sm text-[#c5c5c5] text-left sm:text-base">
+						Only post links that are from imgur or discord!
+					</p>
 				</div>
 			</div>
 

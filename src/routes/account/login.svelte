@@ -70,7 +70,7 @@
 			})
 			.then((res) => {
 				localStorage.setItem('jwt_token', res.data.success.access_token);
-				location.reload();
+				location.replace("/account/profile");
 			})
 			.catch((err) => {
 				if (err.response) {

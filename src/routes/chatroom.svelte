@@ -288,7 +288,7 @@
 									<img
 										src={getPFP(message.user.photoURL)}
 										alt="PFP"
-										class="rounded-full w-10 h-10 origin-center sm:w-12 sm:h-12"
+										class="rounded-full w-10 h-10 origin-center object-cover sm:w-12 sm:h-12"
 									/>
 									<img
 										src={message.badge}
