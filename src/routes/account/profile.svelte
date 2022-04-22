@@ -186,13 +186,13 @@
 			>
 				<!-- svelte-ignore missing-declaration -->
 				<button
-					class="border-2 border-[#cbff6a] px-10 py-2 rounded-md text-sm sm:text-base"
+					class="border-2 border-[#cbff6a] px-10 py-2 rounded-md text-sm transition-colors ease-out duration-150 hover:text-[#c2ff4f] sm:text-base"
 					on:click={() => logout(event)}
 				>
 					Logout
 				</button>
 				<button
-					class="border-2 border-[#cbff6a] px-10 py-2 rounded-md text-sm sm:text-base"
+					class="border-2 border-[#cbff6a] px-10 py-2 rounded-md text-sm transition-colors ease-out duration-150 hover:text-[#c2ff4f] sm:text-base"
 					on:click={saveChanges}
 				>
 					Save changes
