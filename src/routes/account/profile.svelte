@@ -1,6 +1,13 @@
 <script lang="ts">
 	import Menu from "/src/components/common/Menu.svelte";
 
+	import {
+		checkMainColor,
+		getMainColor,
+		getBorderColor,
+		setNewMainColor,
+	} from "/src/components/common/mainColor";
+
 	import { onMount } from "svelte";
 
 	import axios from "axios";
@@ -13,6 +20,7 @@
 
 	let newPFP: string;
 	let newDisplayName: string;
+	let newMainColor: string;
 
 	let userData: any = {
 		display_name: "",
@@ -20,7 +28,16 @@
 		photoURL: "",
 	};
 
+	let mainColor: string;
+	let borderColor: string;
+
 	onMount(async () => {
+		checkMainColor();
+
+		mainColor = getMainColor();
+		newMainColor = mainColor;
+		borderColor = getBorderColor();
+
 		const token = localStorage.getItem("jwt_token");
 		if (!(token == null)) {
 			const config = {
@@ -42,7 +59,11 @@
 					loggedUser = true;
 					messageStatus = "";
 					await axios
-						.post("https://api-chatapp-pva.herokuapp.com/profile/userData", {}, config)
+						.post(
+							"https://api-chatapp-pva.herokuapp.com/profile/userData",
+							{},
+							config
+						)
 						.then((user) => {
 							userData = user.data.user;
 							if (
@@ -86,6 +107,17 @@
 	}
 
 	async function saveChanges() {
+		if (
+			(newPFP == undefined || newPFP == "" || newPFP == null) &&
+			(newDisplayName == undefined ||
+				newDisplayName == "" ||
+				newDisplayName == null)
+		) {
+			setNewMainColor(newMainColor);
+			location.reload();
+			return;
+		}
+
 		const token = localStorage.getItem("jwt_token");
 		if (!(token == null)) {
 			const config = {
@@ -93,6 +125,8 @@
 					Authorization: `Bearer ${token}`,
 				},
 			};
+
+			setNewMainColor(newMainColor);
 
 			await axios
 				.post(
@@ -118,14 +152,15 @@
 	}
 </script>
 
-<div class="min-h-screen h-full w-full flex justify-center items-center">
+<div class="min-h-screen h-full w-full flex justify-center items-center" style="--theme-mainColor: {mainColor}; --theme-borderColor: {borderColor}">
 	{#if loggedUser && display}
 		<div
 			class="w-4/5 flex flex-col items-center gap-8 font-ms text-2xl text-grayWhite text-center sm:text-4xl"
 		>
-			<div class="font-bold text-[#cbff6a]">
+			<div class="font-bold mainColor">
 				<h1>Your profile:</h1>
 			</div>
+
 			<div
 				class="w-full flex flex-col items-center gap-2 text-xl text-grayWhite text-center font-semibold sm:text-2xl"
 			>
@@ -134,6 +169,7 @@
 					Account created at: {new Date(userData.created).toLocaleString()}
 				</h4>
 			</div>
+
 			<div
 				class="w-full flex flex-col items-center gap-2 text-xl text-grayWhite text-center font-semibold sm:text-2xl"
 			>
@@ -181,18 +217,32 @@
 					/>
 				</div>
 			</div>
+
+			<div
+				class="w-full flex flex-col items-center gap-2 text-xl text-grayWhite text-center font-semibold sm:text-2xl"
+			>
+				<h3 class="">Change your main outline color</h3>
+				<div class="w-5/6 max-w-md">
+					<input
+						type="color"
+						class="w-full outline-none rounded bg-[#00000000] border-none"
+						bind:value={newMainColor}
+					/>
+				</div>
+			</div>
+
 			<div
 				class="w-full max-w-md flex flex-col-reverse justify-between items-center gap-6 text-xl text-grayWhite text-center font-semibold sm:flex-row sm:text-2xl"
 			>
 				<!-- svelte-ignore missing-declaration -->
 				<button
-					class="border-2 border-[#cbff6a] px-10 py-2 rounded-md text-sm transition-colors ease-out duration-150 hover:text-[#c2ff4f] sm:text-base"
+					class="border-2 borderColor px-10 py-2 rounded-md text-sm transition-colors ease-out duration-150 hoverButtonColor sm:text-base"
 					on:click={() => logout(event)}
 				>
 					Logout
 				</button>
 				<button
-					class="border-2 border-[#cbff6a] px-10 py-2 rounded-md text-sm transition-colors ease-out duration-150 hover:text-[#c2ff4f] sm:text-base"
+					class="border-2 borderColor px-10 py-2 rounded-md text-sm transition-colors ease-out duration-150 hoverButtonColor sm:text-base"
 					on:click={saveChanges}
 				>
 					Save changes
@@ -216,3 +266,17 @@
 		</div>
 	{/if}
 </div>
+
+<style scoped>
+	.mainColor {
+		color: var(--theme-mainColor);
+	}
+
+	.borderColor {
+		border-color: var(--theme-borderColor);
+	}
+
+	.hoverButtonColor:hover {
+		color: var(--theme-mainColor);
+	}
+</style>

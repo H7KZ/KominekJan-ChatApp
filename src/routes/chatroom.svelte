@@ -2,6 +2,12 @@
 	//IMPORTS
 	import Menu from "/src/components/common/Menu.svelte";
 
+	import {
+		checkMainColor,
+		getMainColor,
+		getBorderColor,
+	} from "/src/components/common/mainColor";
+
 	import { io } from "socket.io-client";
 
 	import axios from "axios";
@@ -23,8 +29,6 @@
 	let display: boolean = false;
 
 	let sidebar: boolean;
-
-	let fillColor: String = "#C1C8D8";
 
 	let rooms = [
 		{
@@ -56,9 +60,17 @@
 	let messageStatus: string = "";
 	let statusColor: string = "";
 
+	let mainColor: string;
+	let borderColor: string;
+
 	//ON MOUNT
 
 	onMount(async () => {
+		checkMainColor();
+
+		mainColor = getMainColor();
+		borderColor = getBorderColor();
+
 		//GET LOGGED USER
 		const token = localStorage.getItem("jwt_token");
 		if (!(token == null)) {
@@ -212,7 +224,7 @@
 </script>
 
 <!--HTML-->
-<div class="min-h-screen h-screen w-full flex justify-center items-center">
+<div class="min-h-screen h-screen w-full flex justify-center items-center" style="--theme-mainColor: {mainColor}; --theme-borderColor: {borderColor}">
 	{#if loggedUser && display}
 		<!--MESSAGES-->
 		<div
@@ -222,7 +234,7 @@
 			{#if sidebar}
 				<div class="h-full w-60 bg-[#222222] flex-shrink-0 z-20">
 					<div class="flex flex-col items-start gap-2 py-2 px-4">
-						<h2 class="text-[#c6ff5be7] text-xl font-bold">Rooms:</h2>
+						<h2 class="mainColor text-xl font-bold">Rooms:</h2>
 						{#each rooms as room}
 							<button
 								class="text-grayWhite h-full w-full text-left bg-[#444444] rounded-lg pl-2"
@@ -251,7 +263,7 @@
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								viewBox="0 0 24 24"
-								style="fill: {fillColor};"
+								style="fill: {mainColor};"
 								class="h-8"
 								><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z" /></svg
 							>
@@ -302,7 +314,7 @@
 
 							<div class="flex flex-col w-full">
 								<div class="w-5/6">
-									<h2 class="text-sm text-[#c6ff5be7] sm:text-base m-0">
+									<h2 class="text-sm mainColor sm:text-base m-0">
 										{message.user.display_name}
 										&nbsp;&nbsp;&nbsp;
 										<span class="text-xs text-[#9e9e9e]">
@@ -322,20 +334,19 @@
 					<div class="w-full h-20 flex items-start gap-2">
 						<textarea
 							name="messageBox"
-							class="resize-none w-full h-full bg-[#222222] border-2 border-[#b9ec5a] text-sm md:text-base rounded-md outline-none px-2 py-1 text-grayWhite"
+							class="resize-none w-full h-full bg-[#222222] border-2 borderColor text-sm md:text-base rounded-md outline-none px-2 py-1 text-grayWhite"
 							placeholder="Type your message..."
 							bind:value={messageBox}
 						/>
 						<!-- svelte-ignore missing-declaration -->
 						<button
-							class="h-full border-2 border-[#c6ff5be7] rounded-md w-20 flex items-center justify-center"
+							class="h-full border-2 borderColor rounded-md w-20 flex items-center justify-center"
 							on:click={() => sendMessage(event)}
 						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								viewBox="0 0 24 24"
-								style="fill: #fff;"
-								class="h-12"
+								class="h-12 transition-colors ease-out duration-150 fillIconColor"
 								><path
 									d="M11 8.414V18h2V8.414l4.293 4.293 1.414-1.414L12 4.586l-6.707 6.707 1.414 1.414z"
 								/></svg
@@ -368,7 +379,7 @@
 <style scoped>
 	.custom-scrollbar {
 		scrollbar-width: none;
-		scrollbar-color: #c6ff5b;
+		scrollbar-color: var(--theme-mainColor);
 	}
 	/* Chrome, Edge, and Safari */
 	.custom-scrollbar::-webkit-scrollbar {
@@ -377,11 +388,31 @@
 		border-radius: 4px;
 	}
 	.custom-scrollbar::-webkit-scrollbar-thumb {
-		background-color: #c6ff5b;
+		background-color: var(--theme-mainColor);
 		border-radius: 4px;
 	}
 
 	.dropdown:hover .dropdown-content {
 		display: flex;
+	}
+
+	.mainColor {
+		color: var(--theme-mainColor);
+	}
+
+	.borderColor {
+		border-color: var(--theme-borderColor);
+	}
+
+	.hoverButtonColor:hover {
+		color: var(--theme-mainColor);
+	}
+
+	.fillIconColor {
+		fill: #fff;
+	}
+
+	.fillIconColor:hover {
+		fill: var(--theme-mainColor);
 	}
 </style>

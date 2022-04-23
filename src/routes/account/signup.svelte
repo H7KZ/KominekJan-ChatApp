@@ -1,7 +1,14 @@
 <script lang="ts">
-	import axios from 'axios';
+	import {
+		checkMainColor,
+		getMainColor,
+		getBorderColor,
+	} from "/src/components/common/mainColor";
 
-	import signupSchema from '../../components/joiSchemas/signup';
+	import axios from "axios";
+
+	import signupSchema from "../../components/joiSchemas/signup";
+	import { onMount } from "svelte";
 
 	let email: string;
 	let password: string;
@@ -9,6 +16,16 @@
 	let display_name: string;
 
 	let messageStatus: string = "";
+
+	let mainColor: string;
+	let borderColor: string;
+
+	onMount(() => {
+		checkMainColor();
+
+		mainColor = getMainColor();
+		borderColor = getBorderColor();
+	});
 
 	async function signup(e: Event) {
 		e.preventDefault();
@@ -20,24 +37,26 @@
 				email: email,
 				password: password,
 				confirmPassword: confirmPassword,
-				display_name: display_name
+				display_name: display_name,
 			});
 		} catch (error) {
 			messageStatus = error;
 			return;
 		}
 
-		messageStatus = 'loading . . .';
+		messageStatus = "loading . . .";
 
 		await axios
-			.post('https://api-chatapp-pva.herokuapp.com/auth/signup', {
+			.post("https://api-chatapp-pva.herokuapp.com/auth/signup", {
 				email: value.email,
 				password: value.password,
-				display_name: value.display_name
+				display_name: value.display_name,
 			})
 			.then(() => {
-				messageStatus = '';
-				location.replace('https://production.chatappkominekjan.pages.dev/verify/pending');
+				messageStatus = "";
+				location.replace(
+					"https://production.chatappkominekjan.pages.dev/verify/pending"
+				);
 			})
 			.catch((err) => {
 				if (err.response) {
@@ -49,11 +68,14 @@
 	}
 </script>
 
-<div class="min-h-screen h-full w-full flex justify-center items-center">
+<div
+	class="min-h-screen h-full w-full flex justify-center items-center"
+	style="--theme-mainColor: {mainColor}; --theme-borderColor: {borderColor}"
+>
 	<div
 		class="w-full flex flex-col items-center gap-12 font-ms font-semibold text-2xl text-grayWhite text-center sm:text-4xl"
 	>
-		<h1 class="font-bold text-[#cbff6a]">Sign in</h1>
+		<h1 class="font-bold mainColor">Sign in</h1>
 		<form
 			class="flex flex-col items-center gap-6 w-4/5 max-w-xl text-xl font-medium sm:text-2xl"
 			action="POST"
@@ -92,7 +114,7 @@
 			/>
 			<!-- svelte-ignore missing-declaration -->
 			<button
-				class="border-2 border-[#cbff6a] font-semibold px-10 py-2 rounded-md transition-colors ease-out duration-150 hover:text-[#c2ff4f]"
+				class="border-2 borderColor font-semibold px-10 py-2 rounded-md transition-colors ease-out duration-150 hoverButtonColor"
 				on:click={() => signup(event)}
 			>
 				Sign up & verify my email
@@ -101,7 +123,7 @@
 				<p>
 					Are you already registered? <a
 						href="/account/login"
-						class="text-[#cbff6a] italic underline">Log in</a
+						class="mainColor italic underline">Log in</a
 					>
 				</p>
 			</div>
@@ -109,3 +131,17 @@
 		<p class="text-base text-[#ff6565] sm:text-lg">{messageStatus}</p>
 	</div>
 </div>
+
+<style scoped>
+	.mainColor {
+		color: var(--theme-mainColor);
+	}
+
+	.borderColor {
+		border-color: var(--theme-borderColor);
+	}
+
+	.hoverButtonColor:hover {
+		color: var(--theme-mainColor);
+	}
+</style>

@@ -1,4 +1,10 @@
 <script lang="ts">
+	import {
+		checkMainColor,
+		getMainColor,
+		getBorderColor,
+	} from "/src/components/common/mainColor";
+
 	import { onMount } from 'svelte';
 
 	import axios from 'axios';
@@ -12,8 +18,16 @@
 	let password: string;
 
 	let messageStatus: string = "";
+	
+	let mainColor: string;
+	let borderColor: string;
 
 	onMount(async () => {
+		checkMainColor();
+
+		mainColor = getMainColor();
+		borderColor = getBorderColor();
+
 		const token = localStorage.getItem('jwt_token');
 		if (!(token == null)) {
 			const config = {
@@ -82,7 +96,7 @@
 	}
 </script>
 
-<div class="min-h-screen h-full w-full flex justify-center items-center">
+<div class="min-h-screen h-full w-full flex justify-center items-center" style="--theme-mainColor: {mainColor}; --theme-borderColor: {borderColor}">
 	{#if loggedUser && display}
 		<div class="flex flex-col gap-4 items-center">
 			<h2 class="font-ms font-semibold text-xl text-grayWhite">You are already Logged In!</h2>
@@ -91,7 +105,7 @@
 		<div
 			class="w-full flex flex-col items-center gap-12 font-ms font-semibold text-2xl text-grayWhite text-center sm:text-4xl"
 		>
-			<h1 class="font-bold text-[#cbff6a]">Log in</h1>
+			<h1 class="font-bold mainColor">Log in</h1>
 			<form
 				class="flex flex-col items-center gap-6 w-4/5 max-w-xl text-xl font-medium sm:text-2xl"
 				action="POST"
@@ -114,7 +128,7 @@
 				/>
 				<!-- svelte-ignore missing-declaration -->
 				<button
-					class="border-2 border-[#cbff6a] font-semibold px-10 py-2 rounded-md transition-colors ease-out duration-150 hover:text-[#c2ff4f]"
+					class="border-2 borderColor font-semibold px-10 py-2 rounded-md transition-colors ease-out duration-150 hoverButtonColor"
 					on:click={() => login(event)}
 				>
 					Login
@@ -123,7 +137,7 @@
 					<p>
 						You are not registered yet? <a
 							href="/account/signup"
-							class="text-[#cbff6a] italic underline">Create an account</a
+							class="mainColor italic underline">Create an account</a
 						>
 					</p>
 				</div>
@@ -132,3 +146,17 @@
 		</div>
 	{/if}
 </div>
+
+<style scoped>
+	.mainColor {
+		color: var(--theme-mainColor);
+	}
+
+	.borderColor {
+		border-color: var(--theme-borderColor);
+	}
+
+	.hoverButtonColor:hover {
+		color: var(--theme-mainColor);
+	}
+</style>
