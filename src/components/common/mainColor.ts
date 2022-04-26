@@ -3,25 +3,17 @@ function setMainColor() {
 	localStorage.setItem("borderColor", "#cbff6a");
 }
 
-/**
- * @param {string} color
- */
-export function setNewMainColor(color) {
+export function setNewMainColor(color: string) {
 	localStorage.setItem("mainColor", color);
 	localStorage.setItem("borderColor", color);
 }
 
-/**
- * @param {string} color
- */
-export function changeMainColor(color) {
+export function changeMainColor(color: string) {
 	localStorage.setItem("mainColor", color);
 }
 
 export function getMainColor() {
-	return (
-		localStorage.getItem("mainColor")
-	);
+	return localStorage.getItem("mainColor");
 }
 
 export function getBorderColor() {
@@ -29,7 +21,9 @@ export function getBorderColor() {
 }
 
 function getAllColors() {
-	return localStorage.getItem("mainColor") && localStorage.getItem("borderColor");
+	return (
+		localStorage.getItem("mainColor") && localStorage.getItem("borderColor")
+	);
 }
 
 export function checkMainColor() {
