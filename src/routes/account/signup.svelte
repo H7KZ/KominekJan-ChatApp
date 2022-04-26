@@ -1,14 +1,12 @@
 <script lang="ts">
-	import {
-		checkMainColor,
-		getMainColor,
-		getBorderColor,
-	} from "/src/components/common/mainColor";
-
-	import axios from "axios";
-
-	import signupSchema from "../../components/joiSchemas/signup";
 	import { onMount } from "svelte";
+
+	import { signUpUser } from "/src/components/common/signup";
+
+	import {
+		getMainColor,
+		checkMainColor,
+	} from "/src/components/common/mainColor";
 
 	let email: string;
 	let password: string;
@@ -17,60 +15,31 @@
 
 	let messageStatus: string = "";
 
-	let mainColor: string;
-	let borderColor: string;
+	let mainColor: string = "";
 
-	onMount(() => {
-		checkMainColor();
+	onMount(async () => {
+		await checkMainColor();
 
-		mainColor = getMainColor();
-		borderColor = getBorderColor();
+		mainColor = await getMainColor();
 	});
 
 	async function signup(e: Event) {
 		e.preventDefault();
 
-		let value: any;
-
-		try {
-			value = await signupSchema.validateAsync({
-				email: email,
-				password: password,
-				confirmPassword: confirmPassword,
-				display_name: display_name,
-			});
-		} catch (error) {
-			messageStatus = error;
-			return;
-		}
-
 		messageStatus = "loading . . .";
 
-		await axios
-			.post("https://api-chatapp-pva.herokuapp.com/auth/signup", {
-				email: value.email,
-				password: value.password,
-				display_name: value.display_name,
-			})
-			.then(() => {
-				messageStatus = "";
-				location.replace(
-					"https://production.chatappkominekjan.pages.dev/verify/pending"
-				);
-			})
-			.catch((err) => {
-				if (err.response) {
-					messageStatus = err.response.data.error.message;
-				} else if (err.request) {
-					console.log(err.request);
-				}
-			});
+		messageStatus = await signUpUser(
+			email,
+			password,
+			confirmPassword,
+			display_name
+		);
 	}
 </script>
 
 <div
 	class="min-h-screen h-full w-full flex justify-center items-center"
-	style="--theme-mainColor: {mainColor}; --theme-borderColor: {borderColor}"
+	style="--theme-mainColor: {mainColor};"
 >
 	<div
 		class="w-full flex flex-col items-center gap-12 font-ms font-semibold text-2xl text-grayWhite text-center sm:text-4xl"
@@ -138,7 +107,7 @@
 	}
 
 	.borderColor {
-		border-color: var(--theme-borderColor);
+		border-color: var(--theme-mainColor);
 	}
 
 	.hoverButtonColor:hover {

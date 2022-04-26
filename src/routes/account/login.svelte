@@ -1,107 +1,52 @@
 <script lang="ts">
+	import { onMount } from "svelte";
+
+	import { isUserLoggedIn } from "/src/components/common/token";
+
+	import { logInUser } from "/src/components/common/login";
+
 	import {
-		checkMainColor,
 		getMainColor,
-		getBorderColor,
+		checkMainColor,
 	} from "/src/components/common/mainColor";
 
-	import { onMount } from 'svelte';
-
-	import axios from 'axios';
-
-	import loginSchema from '../../components/joiSchemas/login';
-
-	let loggedUser: boolean;
-	let display: boolean = false;
+	let user: any = {
+		loggedUser: null,
+		display: null,
+		messageStatus: "loading . . .",
+	};
 
 	let email: string;
 	let password: string;
 
-	let messageStatus: string = "";
-	
-	let mainColor: string;
-	let borderColor: string;
+	let mainColor: string = "";
 
 	onMount(async () => {
-		checkMainColor();
+		await checkMainColor();
 
-		mainColor = getMainColor();
-		borderColor = getBorderColor();
+		mainColor = await getMainColor();
 
-		const token = localStorage.getItem('jwt_token');
-		if (!(token == null)) {
-			const config = {
-				headers: {
-					Authorization: `Bearer ${token}`
-				}
-			};
-
-			messageStatus = 'loading . . .';
-
-			await axios
-				.post('https://api-chatapp-pva.herokuapp.com/auth/isloggedin', {}, config)
-				.then(() => {
-					display = true;
-					loggedUser = true;
-					messageStatus = '';
-				})
-				.catch((err) => {
-					display = true;
-					loggedUser = false;
-					if (err.response) {
-						messageStatus = err.response.data.error.message;
-					} else if (err.request) {
-						console.log(err.request);
-					}
-				});
-		} else {
-			display = true;
-			loggedUser = false;
-		}
+		user = await isUserLoggedIn();
 	});
 
 	async function login(e: Event) {
 		e.preventDefault();
 
-		let value: any;
-
-		try {
-			value = await loginSchema.validateAsync({
-				email: email,
-				password: password
-			});
-		} catch (error) {
-			messageStatus = error;
-			return;
-		}
-
-		messageStatus = 'loading . . .';
-
-		await axios
-			.post('https://api-chatapp-pva.herokuapp.com/auth/login', {
-				email: value.email,
-				password: value.password
-			})
-			.then((res) => {
-				localStorage.setItem('jwt_token', res.data.success.access_token);
-				location.replace("/account/profile");
-			})
-			.catch((err) => {
-				if (err.response) {
-					messageStatus = err.response.data.error.message;
-				} else if (err.request) {
-					console.log(err.request);
-				}
-			});
+		user.messageStatus = logInUser(email, password);
 	}
 </script>
 
-<div class="min-h-screen h-full w-full flex justify-center items-center" style="--theme-mainColor: {mainColor}; --theme-borderColor: {borderColor}">
-	{#if loggedUser && display}
+<div
+	class="min-h-screen h-full w-full flex justify-center items-center"
+	style="--theme-mainColor: {mainColor}"
+>
+	{#if user.loggedUser && user.display}
 		<div class="flex flex-col gap-4 items-center">
-			<h2 class="font-ms font-semibold text-xl text-grayWhite">You are already Logged In!</h2>
+			<h2 class="font-ms font-semibold text-xl text-grayWhite">
+				You are already Logged In!
+			</h2>
 		</div>
-	{:else if !loggedUser && display}
+	{:else if !user.loggedUser && user.display}
 		<div
 			class="w-full flex flex-col items-center gap-12 font-ms font-semibold text-2xl text-grayWhite text-center sm:text-4xl"
 		>
@@ -142,7 +87,7 @@
 					</p>
 				</div>
 			</form>
-			<p class="text-base text-[#ff6565] sm:text-lg">{messageStatus}</p>
+			<p class="text-base text-[#ff6565] sm:text-lg">{user.messageStatus}</p>
 		</div>
 	{/if}
 </div>
@@ -153,7 +98,7 @@
 	}
 
 	.borderColor {
-		border-color: var(--theme-borderColor);
+		border-color: var(--theme-mainColor);
 	}
 
 	.hoverButtonColor:hover {

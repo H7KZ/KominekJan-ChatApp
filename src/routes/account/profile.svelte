@@ -1,102 +1,43 @@
 <script lang="ts">
-	import Menu from "/src/components/common/Menu.svelte";
-
-	import {
-		checkMainColor,
-		getMainColor,
-		getBorderColor,
-		setNewMainColor,
-	} from "/src/components/common/mainColor";
-
 	import { onMount } from "svelte";
 
-	import axios from "axios";
+	import { getLoggedInUserData } from "/src/components/common/profile";
 
-	let loggedUser: boolean;
-	let display: boolean = false;
-	let messageStatus: string = "";
+	import {
+		getMainColor,
+		checkMainColor,
+	} from "/src/components/common/mainColor";
 
-	let userDataLoaded: boolean = false;
+	import { saveProfileChanges } from "/src/components/common/profile";
+
+	import Menu from "/src/components/common/Menu.svelte";
+
+	let user: any = {
+		loggedUser: null,
+		display: null,
+		userDataLoaded: null,
+		userData: {
+			display_name: "",
+			email: "",
+			photoURL: "",
+			created: "",
+		},
+		messageStatus: "loading . . .",
+	};
 
 	let newPFP: string;
 	let newDisplayName: string;
 	let newMainColor: string;
 
-	let userData: any = {
-		display_name: "",
-		email: "",
-		photoURL: "",
-	};
-
-	let mainColor: string;
-	let borderColor: string;
+	let mainColor: string = "";
 
 	onMount(async () => {
-		checkMainColor();
+		await checkMainColor();
 
-		mainColor = getMainColor();
+		mainColor = await getMainColor();
 		newMainColor = mainColor;
-		borderColor = getBorderColor();
 
-		const token = localStorage.getItem("jwt_token");
-		if (!(token == null)) {
-			const config = {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			};
-
-			messageStatus = "loading . . .";
-
-			await axios
-				.post(
-					"https://api-chatapp-pva.herokuapp.com/auth/isloggedin",
-					{},
-					config
-				)
-				.then(async () => {
-					display = true;
-					loggedUser = true;
-					messageStatus = "";
-					await axios
-						.post(
-							"https://api-chatapp-pva.herokuapp.com/profile/userData",
-							{},
-							config
-						)
-						.then((user) => {
-							userData = user.data.user;
-							if (
-								userData.photoURL == "" ||
-								userData.photoURL == null ||
-								userData.photoURL == undefined
-							) {
-								userData.photoURL = "default_pfp.png";
-							}
-							userDataLoaded = true;
-						})
-						.catch((err) => {
-							userDataLoaded = true;
-							if (err.response) {
-								messageStatus = err.response.data.error.message;
-							} else if (err.request) {
-								console.log(err.request);
-							}
-						});
-				})
-				.catch((err) => {
-					display = true;
-					loggedUser = false;
-					if (err.response) {
-						messageStatus = err.response.data.error.message;
-					} else if (err.request) {
-						console.log(err.request);
-					}
-				});
-		} else {
-			display = true;
-			loggedUser = false;
-		}
+		user = await getLoggedInUserData();
 	});
 
 	async function logout(e: Event) {
@@ -106,54 +47,22 @@
 		location.reload();
 	}
 
-	async function saveChanges() {
-		if (
-			(newPFP == undefined || newPFP == "" || newPFP == null) &&
-			(newDisplayName == undefined ||
-				newDisplayName == "" ||
-				newDisplayName == null)
-		) {
-			setNewMainColor(newMainColor);
-			location.reload();
-			return;
-		}
+	async function saveChanges(e: Event) {
+		e.preventDefault();
 
-		const token = localStorage.getItem("jwt_token");
-		if (!(token == null)) {
-			const config = {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			};
-
-			setNewMainColor(newMainColor);
-
-			await axios
-				.post(
-					"https://api-chatapp-pva.herokuapp.com/profile/changeUserData",
-					{
-						photoURL: newPFP,
-						display_name: newDisplayName,
-					},
-					config
-				)
-				.then(() => {
-					messageStatus = "Changes saved!";
-					location.reload();
-				})
-				.catch((err) => {
-					if (err.response) {
-						messageStatus = err.response.data.error.message;
-					} else if (err.request) {
-						console.log(err.request);
-					}
-				});
-		}
+		user.userData.messageStatus = saveProfileChanges(
+			newPFP,
+			newMainColor,
+			newDisplayName
+		);
 	}
 </script>
 
-<div class="min-h-screen h-full w-full flex justify-center items-center" style="--theme-mainColor: {mainColor}; --theme-borderColor: {borderColor}">
-	{#if loggedUser && display}
+<div
+	class="min-h-screen h-full w-full flex justify-center items-center"
+	style="--theme-mainColor: {mainColor};"
+>
+	{#if user.loggedUser && user.display}
 		<div
 			class="w-4/5 flex flex-col items-center gap-8 font-ms text-2xl text-grayWhite text-center sm:text-4xl"
 		>
@@ -164,9 +73,9 @@
 			<div
 				class="w-full flex flex-col items-center gap-2 text-xl text-grayWhite text-center font-semibold sm:text-2xl"
 			>
-				<h3 class="">{userData.email}</h3>
+				<h3 class="">{user.userData.email}</h3>
 				<h4 class="text-base text-[#c5c5c5] sm:text-lg">
-					Account created at: {new Date(userData.created).toLocaleString()}
+					Account created at: {new Date(user.userData.created).toLocaleString()}
 				</h4>
 			</div>
 
@@ -174,11 +83,11 @@
 				class="w-full flex flex-col items-center gap-2 text-xl text-grayWhite text-center font-semibold sm:text-2xl"
 			>
 				<div class="relative">
-					{#if userDataLoaded}
+					{#if user.userDataLoaded}
 						<!-- svelte-ignore a11y-missing-attribute -->
 						<center>
 							<img
-								src={userData.photoURL}
+								src={user.userData.photoURL}
 								class="rounded-full w-20 h-20 origin-center object-cover sm:w-28 sm:h-28"
 							/>
 						</center>
@@ -194,7 +103,7 @@
 				>
 					<input
 						type="text"
-						placeholder={userData.photoURL}
+						placeholder={user.userData.photoURL}
 						class="w-full text-[#242424] outline-none rounded p-1 placeholder:text-[#969696]"
 						bind:value={newPFP}
 					/>
@@ -211,7 +120,7 @@
 				<div class="w-5/6 max-w-md text-lg font-medium sm:text-xl">
 					<input
 						type="text"
-						placeholder={userData.display_name}
+						placeholder={user.userData.display_name}
 						class="w-full text-[#242424] outline-none rounded p-1 placeholder:text-[#969696]"
 						bind:value={newDisplayName}
 					/>
@@ -243,18 +152,18 @@
 				</button>
 				<button
 					class="border-2 borderColor px-10 py-2 rounded-md text-sm transition-colors ease-out duration-150 hoverButtonColor sm:text-base"
-					on:click={saveChanges}
+					on:click={() => saveChanges(event)}
 				>
 					Save changes
 				</button>
 			</div>
 			<div>
 				<p class="text-[#fff]">
-					{messageStatus}
+					{user.messageStatus}
 				</p>
 			</div>
 		</div>
-	{:else if !loggedUser && display}
+	{:else if !user.loggedUser && user.display}
 		<div
 			class="flex flex-col gap-10 items-center text-grayWhite text-xl font-semibold sm:text-2xl"
 		>
@@ -262,8 +171,10 @@
 				You need to be logged in to see your account!
 			</h2>
 			<Menu />
-			<p class="text-base text-[#ff6565] sm:text-lg">{messageStatus}</p>
+			<p class="text-base text-[#ff6565] sm:text-lg">{user.messageStatus}</p>
 		</div>
+	{:else}
+		<p class="text-base text-[#ff6565] sm:text-lg">{user.messageStatus}</p>
 	{/if}
 </div>
 
@@ -273,7 +184,7 @@
 	}
 
 	.borderColor {
-		border-color: var(--theme-borderColor);
+		border-color: var(--theme-mainColor);
 	}
 
 	.hoverButtonColor:hover {

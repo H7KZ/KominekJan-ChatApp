@@ -1,5 +1,17 @@
 <script lang="ts">
+import { onMount } from "svelte";
+
 	export let showMobileNavbar: boolean = false;
+
+	import { getMainColor, checkMainColor } from "./mainColor";
+
+	let mainColors: string = "";
+
+	onMount(async () => {
+		await checkMainColor();
+
+		mainColors = await getMainColor();
+	});
 
 	let fillColor: String = '#C1C8D8';
 </script>
@@ -8,6 +20,7 @@
 	class="fixed top-0 left-0 h-screen w-screen z-50 bg-[#262626] {showMobileNavbar
 		? 'flex'
 		: 'hidden'} flex-col items-center gap-10 p-2"
+		style="--theme-mainColor: {mainColors}"
 >
 	<div class="w-full flex justify-end">
 		<svg
@@ -35,10 +48,16 @@
 
 		<li class="m-3">
 			<a href="/chatroom" on:click>
-				<button class="border-2 border-[#c2ff4f] rounded-md font-medium px-3 py-0.5">
+				<button class="border-2 borderColor rounded-md font-medium px-3 py-0.5">
 					ChatRoom
 				</button>
 			</a>
 		</li>
 	</ul>
 </div>
+
+<style scoped>
+	.borderColor {
+		border-color: var(--theme-mainColor);
+	}
+</style>
