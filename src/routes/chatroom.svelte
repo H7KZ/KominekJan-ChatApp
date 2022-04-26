@@ -1,20 +1,34 @@
 <script lang="ts">
 	//IMPORTS
-	import Menu from "/src/components/common/Menu.svelte";
+
+	import { onMount } from "svelte";
 
 	import {
-		checkMainColor,
+		isUserLoggedInCR,
+		chatRoomsList,
+	} from "/src/components/common/chatroom";
+
+	import {
 		getMainColor,
-		getBorderColor,
+		checkMainColor,
 	} from "/src/components/common/mainColor";
 
 	import { io } from "socket.io-client";
 
 	import axios from "axios";
 
-	import { onMount } from "svelte";
+	import Menu from "/src/components/common/Menu.svelte";
+
+	import MessageBody from "/src/components/common/messageBody.svelte";
 
 	//VARIABLES
+
+	let user: any = {
+		loggedUser: null,
+		display: null,
+		messageStatus: "loading . . .",
+		statusColor: "",
+	};
 
 	const wait = (timeToDelay: number) =>
 		new Promise((resolve) => setTimeout(resolve, timeToDelay));
@@ -25,101 +39,40 @@
 
 	let canSend: boolean = true;
 
-	let loggedUser: boolean;
-	let display: boolean = false;
-
 	let sidebar: boolean;
 
-	let rooms = [
-		{
-			name: "General 🏝️",
-			id: 0,
-		},
-		{
-			name: "Programming 💻",
-			id: 1,
-		},
-		{
-			name: "Gaming 🎮",
-			id: 2,
-		},
-		{
-			name: "Music 🎵",
-			id: 3,
-		},
-		{
-			name: "Sports 🏀",
-			id: 4,
-		}
-	];
+	let rooms = chatRoomsList;
 
 	let activeRoom = rooms[0];
 
 	let messagesContainer: Element;
 
-	let messageStatus: string = "";
-	let statusColor: string = "";
-
-	let mainColor: string;
-	let borderColor: string;
+	let mainColor: string = "";
 
 	//ON MOUNT
 
 	onMount(async () => {
-		checkMainColor();
+		await checkMainColor();
 
-		mainColor = getMainColor();
-		borderColor = getBorderColor();
+		mainColor = await getMainColor();
 
 		//GET LOGGED USER
-		const token = localStorage.getItem("jwt_token");
-		if (!(token == null)) {
-			const config = {
-				headers: {
-					authorization: `Bearer ${token}`,
-				},
-			};
+		user = await isUserLoggedInCR();
 
-			messageStatus = "loading . . .";
-			statusColor = "text-[#f5c842]";
-
-			await axios
-				.post("https://api-chatapp-pva.herokuapp.com/auth/isloggedin", {}, config)
-				.then(() => {
-					display = true;
-					loggedUser = true;
-					messageStatus = "👍 You can send a message";
-					statusColor = "text-[#c6ff5b]";
-				})
-				.catch((err) => {
-					display = true;
-					loggedUser = false;
-					if (err.response) {
-						messageStatus = err.response.data.error.message;
-						statusColor = "text-[#ff5b5b]";
-					} else if (err.request) {
-						console.log(err.request);
-					}
-				});
-		} else {
-			display = true;
-			loggedUser = false;
-		}
-
-		socket.on("messages", (messagesList) => {
+		socket.on("messages", async (messagesList) => {
 			messages = messagesList;
+			await wait(200);
 			messagesContainer.scrollTop = messagesContainer.scrollHeight;
 		});
 
 		socket.on("messageError", (error) => {
-			messageStatus = error;
-			statusColor = "text-[#ff5b5b]";
+			user.messageStatus = error;
+			user.statusColor = "text-[#ff5b5b]";
 		});
 
 		//SIDEBAR CHATROOM
 		sidebar = window.innerWidth < 768 ? false : true;
 
-		//WHEN WINDOW RESIZES
 		window.addEventListener("resize", () => {
 			if (window.innerWidth < 768) {
 				sidebar = false;
@@ -128,6 +81,7 @@
 			}
 		});
 
+		//MESSAGES CONTAINER SCROLL TO BOTTOM
 		while (messagesContainer.scrollTop != messagesContainer.scrollHeight) {
 			await wait(1000);
 			messagesContainer.scrollTop = messagesContainer.scrollHeight;
@@ -137,29 +91,36 @@
 
 	//FUNCTIONS
 
-	let messageBox: string;
+	let messageText: string;
 
-	async function sendMessage(e: Event) {
+	async function sendMessage(e: Event): Promise<void> {
 		e.preventDefault();
 
 		//VALIDATE MESSAGE
 
-		if (messageBox.trim() == "" || messageBox == null || messageBox == undefined) {
-			messageStatus = "⛔ You can't send an empty message";
-			statusColor = "text-[#ff5b5b]";
+		if (
+			messageText.trim() == "" ||
+			messageText == null ||
+			messageText == undefined
+		) {
+			user.messageStatus = "⛔ You can't send an empty message";
+			user.statusColor = "text-[#ff5b5b]";
 			return;
 		}
 
-		if (messageBox.length > 500) {
-			messageStatus = "⛔ You can't send a message longer than 500 characters. You are over " + (messageBox.length - 500) + " characters";
-			statusColor = "text-[#ff5b5b]";
+		if (messageText.length > 500) {
+			user.messageStatus =
+				"⛔ You can't send a message longer than 500 characters. You are over " +
+				(messageText.length - 500) +
+				" characters";
+			user.statusColor = "text-[#ff5b5b]";
 			return;
 		}
 
 		//IS READY TO SEND
 		if (canSend) {
-			messageStatus = "🚸 Sending . . .";
-			statusColor = "text-[#f5c842]";
+			user.messageStatus = "🚸 Sending . . .";
+			user.statusColor = "text-[#f5c842]";
 
 			const token = localStorage.getItem("jwt_token");
 			if (!(token == null)) {
@@ -173,59 +134,57 @@
 					.post(
 						"https://api-chatapp-pva.herokuapp.com/message/send",
 						{
-							message: messageBox,
+							message: messageText,
 							room_id: activeRoom.id,
 						},
 						config
 					)
 					.then(async () => {
-						messageBox = "";
-						messageStatus = "✔️ Message sent!";
-						statusColor = "text-[#c6ff5b]";
+						messageText = "";
+						user.messageStatus = "✔️ Message sent!";
+						user.statusColor = "text-[#c6ff5b]";
 						timeout();
 					})
 					.catch(async (err) => {
-						messageStatus = "⛔ " + err.response.data.error.message;
-						statusColor = "text-[#ff6565]";
+						user.messageStatus = "⛔ " + err.response.data.error.message;
+						user.statusColor = "text-[#ff6565]";
 						await wait(8000);
-						messageStatus = "👍 You can send another message";
+						user.messageStatus = "👍 You can send another message";
 					});
 			}
 		} else {
-			messageStatus = "⛔ You can't send another message! Wait 10s!";
-			statusColor = "text-[#ff6565]";
+			user.messageStatus = "⛔ You can't send another message! Wait 10s!";
+			user.statusColor = "text-[#ff6565]";
 		}
 	}
 
-	async function timeout() {
+	async function timeout(): Promise<void> {
 		canSend = false;
-		messageStatus = "⛔ Wait 5s before sending another message";
-		statusColor = "text-[#ff6565]";
+		user.messageStatus = "⛔ Wait 5s before sending another message";
+		user.statusColor = "text-[#ff6565]";
 		await wait(5000);
 		canSend = true;
-		messageStatus = "👍 You can send another message";
-		statusColor = "text-[#c6ff5b]";
+		user.messageStatus = "👍 You can send another message";
+		user.statusColor = "text-[#c6ff5b]";
 	}
 
-	async function switchRooms(room: { name: string; id: number; }) {
+	async function switchRooms(room: {
+		name: string;
+		id: number;
+	}): Promise<void> {
 		activeRoom = room;
 		socket.emit("switchRoom", activeRoom.id.toString());
 		await wait(500);
 		messagesContainer.scrollTop = messagesContainer.scrollHeight;
 	}
-
-	function getPFP(pfp: string) {
-		if (pfp == null || pfp == undefined || pfp == "") {
-			return "default_pfp.png";
-		} else {
-			return pfp;
-		}
-	}
 </script>
 
 <!--HTML-->
-<div class="min-h-screen h-screen w-full flex justify-center items-center" style="--theme-mainColor: {mainColor}; --theme-borderColor: {borderColor}">
-	{#if loggedUser && display}
+<div
+	class="min-h-screen h-screen w-full flex justify-center items-center"
+	style="--theme-mainColor: {mainColor};"
+>
+	{#if user.loggedUser && user.display}
 		<!--MESSAGES-->
 		<div
 			class="h-3/4 w-full flex justify-center items-center font-ms px-4 overflow-x-hidden sm:px-16"
@@ -294,39 +253,7 @@
 				>
 					<!--DISPLAYING MESSAGES-->
 					{#each messages as message}
-						<div class="flex gap-2 text-grayWhite mt-3 w-full">
-							<div class="flex-shrink-0 w-12">
-								<div class="relative w-full h-10 sm:h-12">
-									<img
-										src={getPFP(message.user.photoURL)}
-										alt="PFP"
-										class="rounded-full w-10 h-10 origin-center object-cover sm:w-12 sm:h-12"
-									/>
-									<img
-										src={message.badge}
-										alt=""
-										class="{message.badge
-											? ''
-											: 'hidden'} absolute bottom-0 right-0 h-5 w-5"
-									/>
-								</div>
-							</div>
-
-							<div class="flex flex-col w-full">
-								<div class="w-5/6">
-									<h2 class="text-sm mainColor sm:text-base m-0">
-										{message.user.display_name}
-										&nbsp;&nbsp;&nbsp;
-										<span class="text-xs text-[#9e9e9e]">
-											{new Date(message.createdAt).toLocaleString()}
-										</span>
-									</h2>
-								</div>
-								<p class="text-[#f0f0f0] text-xs break-words w-5/6 sm:text-sm">
-									{message.text}
-								</p>
-							</div>
-						</div>
+						<MessageBody {message} nameColor={mainColor} />
 					{/each}
 				</div>
 				<!--SEND MESSAGE-->
@@ -336,7 +263,7 @@
 							name="messageBox"
 							class="resize-none w-full h-full bg-[#222222] border-2 borderColor text-sm md:text-base rounded-md outline-none px-2 py-1 text-grayWhite"
 							placeholder="Type your message..."
-							bind:value={messageBox}
+							bind:value={messageText}
 						/>
 						<!-- svelte-ignore missing-declaration -->
 						<button
@@ -353,15 +280,13 @@
 							>
 						</button>
 					</div>
-					<p
-						class="text-xs {statusColor} md:text-sm"
-					>
-						{messageStatus}
+					<p class="text-xs {user.statusColor} md:text-sm">
+						{user.messageStatus}
 					</p>
 				</div>
 			</div>
 		</div>
-	{:else if !loggedUser && display}
+	{:else if !user.loggedUser && user.display}
 		<!--YOU ARE NOT LOGGED IN-->
 		<div
 			class="flex flex-col gap-10 items-center text-grayWhite text-xl font-semibold sm:text-2xl"
@@ -370,7 +295,7 @@
 				You need to be logged in to chat! u moron
 			</h2>
 			<Menu />
-			<p class="text-base text-[#ff6565] sm:text-lg">{messageStatus}</p>
+			<p class="text-base text-[#ff6565] sm:text-lg">{user.messageStatus}</p>
 		</div>
 	{/if}
 </div>
@@ -401,7 +326,7 @@
 	}
 
 	.borderColor {
-		border-color: var(--theme-borderColor);
+		border-color: var(--theme-mainColor);
 	}
 
 	.hoverButtonColor:hover {

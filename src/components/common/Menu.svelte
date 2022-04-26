@@ -1,26 +1,23 @@
 <script lang="ts">
 	import {
-		checkMainColor,
 		getMainColor,
-		getBorderColor,
+		checkMainColor,
 	} from "/src/components/common/mainColor";
 
 	import { onMount } from "svelte";
 
-	let mainColor: string;
-	let borderColor: string;
+	let mainColor: string = "";
 
-	onMount(() => {
-		checkMainColor();
+	onMount(async () => {
+		await checkMainColor();
 
-		mainColor = getMainColor();
-		borderColor = getBorderColor();
+		mainColor = await getMainColor();
 	});
 </script>
 
 <a
 	href="/account/login"
-	style="--theme-mainColor: {mainColor}; --theme-borderColor: {borderColor}"
+	style="--theme-mainColor: {mainColor};"
 >
 	<button
 		class="border-2 borderColor font-semibold px-10 py-2 rounded-md transition-colors ease-out duration-150 hoverButtonColor"
@@ -30,7 +27,7 @@
 </a>
 <a
 	href="/account/signup"
-	style="--theme-mainColor: {mainColor}; --theme-borderColor: {borderColor}"
+	style="--theme-mainColor: {mainColor};"
 >
 	<button
 		class="border-2 borderColor font-semibold px-10 py-2 rounded-md transition-colors ease-out duration-150 hoverButtonColor"
@@ -41,7 +38,7 @@
 
 <style scoped>
 	.borderColor {
-		border-color: var(--theme-borderColor);
+		border-color: var(--theme-mainColor);
 	}
 
 	.hoverButtonColor:hover {

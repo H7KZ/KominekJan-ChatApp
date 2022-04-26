@@ -1,22 +1,16 @@
 <script lang="ts">
 	import MobileNavbar from "/src/components/common/MobileNavbar.svelte";
 
-	import {
-		checkMainColor,
-		getMainColor,
-		getBorderColor,
-	} from "/src/components/common/mainColor";
-
 	import { onMount } from "svelte";
 
-	let mainColor: string;
-	let borderColor: string;
+	import { getMainColor, checkMainColor } from "./mainColor";
 
-	onMount(() => {
-		checkMainColor();
+	let mainColor: string = "";
 
-		mainColor = getMainColor();
-		borderColor = getBorderColor();
+	onMount(async () => {
+		await checkMainColor();
+
+		mainColor = await getMainColor();
 	});
 
 	let fillColor: String = "#C1C8D8";
@@ -26,7 +20,7 @@
 
 <div
 	class="w-full h-16 fixed flex flex-row items-center p-2 md:px-8 md:py-4 lg:px-32 lg:py-8 xl:px-48 lx:py-12 bg-[#161616] bg-opacity-70 z-50"
-	style="--theme-mainColor: {mainColor}; --theme-borderColor: {borderColor}"
+	style="--theme-mainColor: {mainColor}"
 >
 	<div
 		class="w-full hidden md:flex flex-row items-center justify-between font-ms text-[#eaf2ff]"
@@ -83,9 +77,7 @@
 				href="/chatroom"
 				class="transition-colors ease-out duration-150 py-2 hoverButtonColor"
 			>
-				<button
-					class="border-2 borderColor rounded-md font-medium px-3 py-0.5"
-				>
+				<button class="border-2 borderColor rounded-md font-medium px-3 py-0.5">
 					ChatRoom
 				</button>
 			</a>
@@ -110,12 +102,8 @@
 		display: flex;
 	}
 
-	.mainColor {
-		color: var(--theme-mainColor);
-	}
-
 	.borderColor {
-		border-color: var(--theme-borderColor);
+		border-color: var(--theme-mainColor);
 	}
 
 	.hoverButtonColor:hover {
