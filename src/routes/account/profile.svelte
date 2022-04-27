@@ -150,6 +150,7 @@
 				>
 					Logout
 				</button>
+				<!-- svelte-ignore missing-declaration -->
 				<button
 					class="border-2 borderColor px-10 py-2 rounded-md text-sm transition-colors ease-out duration-150 hoverButtonColor sm:text-base"
 					on:click={() => saveChanges(event)}
