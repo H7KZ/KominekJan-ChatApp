@@ -19,7 +19,7 @@
 
 	import Menu from "/src/components/common/Menu.svelte";
 
-	import MessageBody from "/src/components/common/messageBody.svelte";
+	import MessageBody from "/src/components/common/MessageBody.svelte";
 
 	//VARIABLES
 
