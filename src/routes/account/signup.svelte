@@ -30,9 +30,9 @@
 
 		messageStatus = await signUpUser(
 			email,
+			display_name,
 			password,
-			confirmPassword,
-			display_name
+			confirmPassword
 		);
 	}
 </script>

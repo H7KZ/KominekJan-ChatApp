@@ -4,9 +4,9 @@ import signupSchema from "../joiSchemas/login";
 
 export async function signUpUser(
 	email: string,
+	display_name: string,
 	password: string,
-	confirmPassword: string,
-	display_name: string
+	confirmPassword: string
 ) {
 	let messageStatus: string = "";
 
@@ -15,9 +15,11 @@ export async function signUpUser(
 	try {
 		value = await signupSchema.validateAsync({
 			email: email,
+			display_name: display_name,
 			password: password,
 			confirmPassword: confirmPassword,
-			display_name: display_name,
+		}, {
+			allowUnknown: true,
 		});
 	} catch (error) {
 		messageStatus = error;
@@ -49,5 +51,5 @@ export async function signUpUser(
 			}
 		);
 
-    return messageStatus;
+	return messageStatus;
 }
