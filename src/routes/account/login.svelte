@@ -32,7 +32,7 @@
 	async function login(e: Event) {
 		e.preventDefault();
 
-		user.messageStatus = logInUser(email, password);
+		user.messageStatus = await logInUser(email, password);
 	}
 </script>
 

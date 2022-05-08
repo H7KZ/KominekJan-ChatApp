@@ -50,7 +50,7 @@
 	async function saveChanges(e: Event) {
 		e.preventDefault();
 
-		user.userData.messageStatus = saveProfileChanges(
+		user.messageStatus = await saveProfileChanges(
 			newPFP,
 			newMainColor,
 			newDisplayName
