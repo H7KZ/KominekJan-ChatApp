@@ -10,10 +10,8 @@ export async function signUpUser(
 ) {
 	let messageStatus: string = "";
 
-	let value: any;
-
 	try {
-		value = await signupSchema.validateAsync({
+		await signupSchema.validateAsync({
 			email: email,
 			display_name: display_name,
 			password: password,
@@ -28,14 +26,14 @@ export async function signUpUser(
 
 	await axios
 		.post("https://api-chatapp-pva.herokuapp.com/auth/signup", {
-			email: value.email,
-			password: value.password,
-			display_name: value.display_name,
+			email: email,
+			password: password,
+			display_name: display_name,
 		})
 		.then(() => {
 			messageStatus = "";
 			location.replace(
-				"https://production.chatappkominekjan.pages.dev/verify/pending"
+				"https://chat.kominekjan.cz/verify/pending"
 			);
 		})
 		.catch(

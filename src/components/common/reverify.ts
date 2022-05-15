@@ -26,7 +26,7 @@ export async function reverifyUser(email: string, password: string) {
 		})
 		.then(() => {
 			location.replace(
-				"https://production.chatappkominekjan.pages.dev/verify/reverify"
+				"https://chat.kominekjan.cz/verify/reverify"
 			);
 		})
 		.catch((err) => {
