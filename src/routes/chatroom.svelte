@@ -61,6 +61,7 @@
 
 		socket.on("messages", async (messagesList) => {
 			messages = messagesList;
+			messages.reverse();
 			await wait(200);
 			messagesContainer.scrollTop = messagesContainer.scrollHeight;
 		});
