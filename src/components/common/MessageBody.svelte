@@ -7,7 +7,7 @@
 </script>
 
 <div
-	class="flex gap-2 text-grayWhite mt-3 w-full"
+	class="w-full flex gap-2 text-grayWhite mt-3"
 	style="--theme-nameColor: {nameColor};"
 >
 	<div class="flex-shrink-0 w-12">
@@ -28,7 +28,7 @@
 	</div>
 
 	<div class="flex flex-col w-full">
-		<div class="w-5/6">
+		<div class="w-full">
 			<h2 class="text-sm nameColor sm:text-base m-0">
 				{message.user.display_name}
 				&nbsp;&nbsp;&nbsp;
@@ -37,7 +37,7 @@
 				</span>
 			</h2>
 		</div>
-		<p class="text-[#f0f0f0] text-xs break-words w-5/6 sm:text-sm">
+		<p class="text-[#f0f0f0] text-xs break-all mr-3 sm:text-sm">
 			{message.text}
 		</p>
 	</div>

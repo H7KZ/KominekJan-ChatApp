@@ -186,9 +186,7 @@
 >
 	{#if user.loggedUser && user.display}
 		<!--MESSAGES-->
-		<div
-			class="h-full w-full flex font-ms"
-		>
+		<div class="h-full w-full flex font-ms">
 			<!--SIDEBAR OF ROOMS-->
 			{#if sidebar}
 				<div class="h-full w-60 bg-[#222222] flex-shrink-0 z-20">
@@ -208,9 +206,7 @@
 			{/if}
 
 			<!--CHATROOM-->
-			<div
-				class="h-full flex flex-col gap-4"
-			>
+			<div class="h-full w-full flex flex-col gap-4">
 				<!--CHATROOM HEADER-->
 				<div
 					class="flex items-center gap-2 pl-2 h-12 bg-[#222222] text-grayWhite flex-shrink-0"
@@ -247,21 +243,24 @@
 					</h2>
 				</div>
 				<!--DISPLAY MESSAGES-->
-				<div
-					class="h-full overflow-y-scroll overflow-x-clip scroll-smooth custom-scrollbar md:pl-4"
-					bind:this={messagesContainer}
-				>
-					<!--DISPLAYING MESSAGES-->
-					{#each messages as message}
-						<MessageBody {message} nameColor={mainColor} />
-					{/each}
+				<div class="h-full w-full overflow-y-hidden px-1 md:px-4">
+					<div
+						class="h-full w-full overflow-y-scroll scroll-smooth custom-scrollbar"
+						bind:this={messagesContainer}
+					>
+						<!--DISPLAYING MESSAGES-->
+						{#each messages as message}
+							<MessageBody {message} nameColor={mainColor} />
+						{/each}
+					</div>
 				</div>
+
 				<!--SEND MESSAGE-->
-				<div class="flex flex-col gap-1 md:pl-4">
+				<div class="flex flex-col gap-1 px-1 md:px-4">
 					<div class="h-20 flex items-start gap-2">
 						<textarea
 							name="messageBox"
-							class="resize-none h-full bg-[#222222] border-2 borderColor text-sm md:text-base rounded-md outline-none px-2 py-1 text-grayWhite"
+							class="resize-none h-full w-full bg-[#222222] border-2 borderColor text-sm md:text-base rounded-md outline-none px-2 py-1 text-grayWhite"
 							placeholder="Type your message..."
 							bind:value={messageText}
 						/>
