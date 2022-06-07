@@ -1,5 +1,7 @@
 import axios from "axios";
 
+import { apiURL } from "./api/api";
+
 export async function isUserLoggedIn() {
 	let messageStatus: string = "";
 	let display: boolean = false;
@@ -13,7 +15,7 @@ export async function isUserLoggedIn() {
 		};
 
 		await axios
-			.post("https://api-chatapp-pva.herokuapp.com/auth/isloggedin", {}, config)
+			.post(`${apiURL}/auth/isloggedin`, {}, config)
 			.then(() => {
 				display = true;
 				loggedUser = true;

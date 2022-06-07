@@ -1,5 +1,7 @@
 import axios from "axios";
 
+import { apiURL } from "./api/api";
+
 import signupSchema from "../joiSchemas/login";
 
 export async function signUpUser(
@@ -25,7 +27,7 @@ export async function signUpUser(
 	}
 
 	await axios
-		.post("https://api-chatapp-pva.herokuapp.com/auth/signup", {
+		.post(`${apiURL}/auth/signup`, {
 			email: email,
 			password: password,
 			display_name: display_name,

@@ -1,5 +1,7 @@
 import axios from "axios";
 
+import { apiURL } from "./api/api";
+
 import loginSchema from "../../components/joiSchemas/login";
 
 export async function reverifyUser(email: string, password: string) {
@@ -20,7 +22,7 @@ export async function reverifyUser(email: string, password: string) {
 	messageStatus = "loading . . .";
 
 	await axios
-		.post("https://api-chatapp-pva.herokuapp.com/auth/verify/resend", {
+		.post(`${apiURL}/auth/verify/resend`, {
 			email: value.email,
 			password: value.password,
 		})

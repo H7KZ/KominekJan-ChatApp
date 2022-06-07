@@ -1,5 +1,7 @@
 import axios from "axios";
 
+import { apiURL } from "./api/api";
+
 export const chatRoomsList = [
 	{
 		name: "General 🏝️",
@@ -48,7 +50,7 @@ export async function isUserLoggedInCR() {
 		statusColor = "text-[#f5c842]";
 
 		await axios
-			.post("https://api-chatapp-pva.herokuapp.com/auth/isloggedin", {}, config)
+			.post(`${apiURL}/auth/isloggedin`, {}, config)
 			.then(() => {
 				display = true;
 				loggedUser = true;

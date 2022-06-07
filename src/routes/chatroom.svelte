@@ -17,6 +17,8 @@
 
 	import axios from "axios";
 
+	import { apiURL } from "/src/components/common/api/api";
+
 	import Menu from "/src/components/common/Menu.svelte";
 
 	import MessageBody from "/src/components/common/MessageBody.svelte";
@@ -33,7 +35,17 @@
 	const wait = (timeToDelay: number) =>
 		new Promise((resolve) => setTimeout(resolve, timeToDelay));
 
-	const socket = io("https://api-chatapp-pva.herokuapp.com/");
+	const socket = io(`${apiURL}/`);
+
+	socket.on("loadMessages", async (messagesList) => {
+		messages = messagesList;
+		messages.reverse();
+	});
+
+	socket.on("firstMessageError", (error) => {
+		user.messageStatus = error;
+		user.statusColor = "text-[#ff5b5b]";
+	});
 
 	let messages = [];
 
@@ -59,6 +71,11 @@
 		//GET LOGGED USER
 		user = await isUserLoggedInCR();
 
+		//MOVE MESSAGES CONTAINER
+		await wait(200);
+			messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+		//SOCKETS
 		socket.on("messages", async (messagesList) => {
 			messages = messagesList;
 			messages.reverse();
@@ -133,7 +150,7 @@
 
 				await axios
 					.post(
-						"https://api-chatapp-pva.herokuapp.com/message/send",
+						`${apiURL}/message/send`,
 						{
 							message: messageText,
 							room_id: activeRoom.id,

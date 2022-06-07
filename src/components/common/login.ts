@@ -1,5 +1,7 @@
 import axios from "axios";
 
+import { apiURL } from "./api/api";
+
 import loginSchema from '../../components/joiSchemas/login';
 
 export async function logInUser(email: string, password: string) {
@@ -20,7 +22,7 @@ export async function logInUser(email: string, password: string) {
 	messageStatus = "loading . . .";
 
 	await axios
-		.post("https://api-chatapp-pva.herokuapp.com/auth/login", {
+		.post(`${apiURL}/auth/login`, {
 			email: value.email,
 			password: value.password,
 		})

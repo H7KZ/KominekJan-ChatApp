@@ -1,5 +1,7 @@
 import axios from "axios";
 
+import { apiURL } from "./api/api";
+
 import { setNewMainColor } from "./mainColor";
 
 export async function saveProfileChanges(
@@ -32,7 +34,7 @@ export async function saveProfileChanges(
 
 		await axios
 			.post(
-				"https://api-chatapp-pva.herokuapp.com/profile/changeUserData",
+				`${apiURL}/profile/changeUserData`,
 				{
 					photoURL: newPFP,
 					display_name: newDisplayName,
@@ -77,14 +79,14 @@ export async function getLoggedInUserData() {
 		};
 
 		await axios
-			.post("https://api-chatapp-pva.herokuapp.com/auth/isloggedin", {}, config)
+			.post(`${apiURL}/auth/isloggedin`, {}, config)
 			.then(async () => {
 				display = true;
 				loggedUser = true;
 				messageStatus = "";
 				await axios
 					.post(
-						"https://api-chatapp-pva.herokuapp.com/profile/userData",
+						`${apiURL}/profile/userData`,
 						{},
 						config
 					)
