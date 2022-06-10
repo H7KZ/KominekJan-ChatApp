@@ -1,8 +1,8 @@
 import axios from "axios";
 
-import { apiURL } from "./api/api";
+import { apiURL } from "/src/lib/functions/api";
 
-import loginSchema from "../../components/joiSchemas/login";
+import loginSchema from "/src/lib/functions/joiSchemas/login";
 
 export async function reverifyUser(email: string, password: string) {
 	let messageStatus: string = "";
@@ -27,9 +27,7 @@ export async function reverifyUser(email: string, password: string) {
 			password: value.password,
 		})
 		.then(() => {
-			location.replace(
-				"https://chat.kominekjan.cz/verify/reverify"
-			);
+			location.replace("https://chat.kominekjan.cz/verify/reverify");
 		})
 		.catch((err) => {
 			if (err.response) {

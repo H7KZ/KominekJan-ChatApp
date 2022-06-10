@@ -1,33 +1,10 @@
 import axios from "axios";
 
-import { apiURL } from "./api/api";
-
-export const chatRoomsList = [
-	{
-		name: "General 🏝️",
-		id: 0,
-	},
-	{
-		name: "Programming 💻",
-		id: 1,
-	},
-	{
-		name: "Gaming 🎮",
-		id: 2,
-	},
-	{
-		name: "Music 🎵",
-		id: 3,
-	},
-	{
-		name: "Sports 🏀",
-		id: 4,
-	},
-];
+import { apiURL } from "/src/lib/functions/api";
 
 export function getUserPFP(pfp: string): string {
 	if (pfp == null || pfp == undefined || pfp == "") {
-		return "default_pfp.png";
+		return "default_pfp.webp";
 	} else {
 		return pfp;
 	}

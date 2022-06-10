@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import { apiURL } from "./api/api";
+import { apiURL } from "/src/lib/functions/api";
 
 export async function isUserLoggedIn() {
 	let messageStatus: string = "";

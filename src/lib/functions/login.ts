@@ -1,11 +1,11 @@
 import axios from "axios";
 
-import { apiURL } from "./api/api";
+import { apiURL } from "/src/lib/functions/api";
 
-import loginSchema from '../../components/joiSchemas/login';
+import loginSchema from "/src/lib/functions/joiSchemas/login";
 
 export async function logInUser(email: string, password: string) {
-    let messageStatus: string = "";
+	let messageStatus: string = "";
 
 	let value: any;
 
@@ -38,5 +38,5 @@ export async function logInUser(email: string, password: string) {
 			}
 		});
 
-    return messageStatus;
+	return messageStatus;
 }

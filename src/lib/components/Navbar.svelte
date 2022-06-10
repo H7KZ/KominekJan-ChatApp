@@ -1,9 +1,9 @@
 <script lang="ts">
-	import MobileNavbar from "/src/components/common/MobileNavbar.svelte";
+	import MobileNavbar from "/src/lib/components/MobileNavbar.svelte";
 
 	import { onMount } from "svelte";
 
-	import { getMainColor, checkMainColor } from "./mainColor";
+	import { getMainColor, checkMainColor } from "/src/lib/functions/mainColor";
 
 	let mainColor: string = "";
 

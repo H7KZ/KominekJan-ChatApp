@@ -1,14 +1,11 @@
 <script lang="ts">
 	import { onMount } from "svelte";
 
-	import { isUserLoggedIn } from "/src/components/common/token";
+	import { isUserLoggedIn } from "/src/lib/functions/token";
 
-	import { reverifyUser } from "/src/components/common/reverify";
+	import { reverifyUser } from "/src/lib/functions/reverify";
 
-	import {
-		getMainColor,
-		checkMainColor,
-	} from "/src/components/common/mainColor";
+	import { getMainColor, checkMainColor } from "/src/lib/functions/mainColor";
 
 	let user: any = {
 		loggedUser: null,

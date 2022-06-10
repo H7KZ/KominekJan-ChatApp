@@ -3,25 +3,21 @@
 
 	import { onMount } from "svelte";
 
-	import {
-		isUserLoggedInCR,
-		chatRoomsList,
-	} from "/src/components/common/chatroom";
+	import { isUserLoggedInCR } from "/src/lib/functions/chatroom";
 
-	import {
-		getMainColor,
-		checkMainColor,
-	} from "/src/components/common/mainColor";
+	import chatRoomsList from "/src/lib/data/chatroomList";
+
+	import { getMainColor, checkMainColor } from "/src/lib/functions/mainColor";
 
 	import { io } from "socket.io-client";
 
 	import axios from "axios";
 
-	import { apiURL } from "/src/components/common/api/api";
+	import { apiURL } from "/src/lib/functions/api";
 
-	import Menu from "/src/components/common/Menu.svelte";
+	import Menu from "/src/lib/components/Menu.svelte";
 
-	import MessageBody from "/src/components/common/MessageBody.svelte";
+	import MessageBody from "/src/lib/components/MessageBody.svelte";
 
 	//VARIABLES
 
@@ -73,7 +69,7 @@
 
 		//MOVE MESSAGES CONTAINER
 		await wait(200);
-			messagesContainer.scrollTop = messagesContainer.scrollHeight;
+		messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
 		//SOCKETS
 		socket.on("messages", async (messagesList) => {

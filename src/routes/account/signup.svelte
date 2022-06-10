@@ -1,12 +1,9 @@
 <script lang="ts">
 	import { onMount } from "svelte";
 
-	import { signUpUser } from "/src/components/common/signup";
+	import { signUpUser } from "/src/lib/functions/signup";
 
-	import {
-		getMainColor,
-		checkMainColor,
-	} from "/src/components/common/mainColor";
+	import { getMainColor, checkMainColor } from "/src/lib/functions/mainColor";
 
 	let email: string;
 	let password: string;

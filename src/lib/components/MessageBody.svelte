@@ -1,5 +1,5 @@
 <script>
-	import { getUserPFP } from "/src/components/common/chatroom";
+	import { getUserPFP } from "/src/lib/functions/chatroom";
 
 	export let message;
 

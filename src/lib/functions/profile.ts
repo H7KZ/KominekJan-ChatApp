@@ -1,8 +1,8 @@
 import axios from "axios";
 
-import { apiURL } from "./api/api";
+import { apiURL } from "/src/lib/functions/api";
 
-import { setNewMainColor } from "./mainColor";
+import { setNewMainColor } from "/src/lib/functions/mainColor";
 
 export async function saveProfileChanges(
 	newPFP: string,
@@ -85,11 +85,7 @@ export async function getLoggedInUserData() {
 				loggedUser = true;
 				messageStatus = "";
 				await axios
-					.post(
-						`${apiURL}/profile/userData`,
-						{},
-						config
-					)
+					.post(`${apiURL}/profile/userData`, {}, config)
 					.then((user) => {
 						userData = user.data.user;
 						if (

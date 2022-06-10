@@ -1,7 +1,7 @@
 <script lang="ts">
-	import Navbar from '/src/components/common/Navbar.svelte';
+	import Navbar from "/src/lib/components/Navbar.svelte";
 
-	import '/src/tailwind/tailwind.css';
+	import "/src/tailwind/tailwind.css";
 </script>
 
 <div class="h-full w-full">

@@ -1,16 +1,13 @@
 <script lang="ts">
 	import { onMount } from "svelte";
 
-	import { getLoggedInUserData } from "/src/components/common/profile";
+	import { getLoggedInUserData } from "/src/lib/functions/profile";
 
-	import {
-		getMainColor,
-		checkMainColor,
-	} from "/src/components/common/mainColor";
+	import { getMainColor, checkMainColor } from "/src/lib/functions/mainColor";
 
-	import { saveProfileChanges } from "/src/components/common/profile";
+	import { saveProfileChanges } from "/src/lib/functions/profile";
 
-	import Menu from "/src/components/common/Menu.svelte";
+	import Menu from "/src/lib/components/Menu.svelte";
 
 	let user: any = {
 		loggedUser: null,

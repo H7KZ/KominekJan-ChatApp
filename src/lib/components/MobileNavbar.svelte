@@ -1,9 +1,9 @@
 <script lang="ts">
-import { onMount } from "svelte";
+	import { onMount } from "svelte";
 
 	export let showMobileNavbar: boolean = false;
 
-	import { getMainColor, checkMainColor } from "./mainColor";
+	import { getMainColor, checkMainColor } from "/src/lib/functions/mainColor";
 
 	let mainColors: string = "";
 
@@ -13,14 +13,14 @@ import { onMount } from "svelte";
 		mainColors = await getMainColor();
 	});
 
-	let fillColor: String = '#C1C8D8';
+	let fillColor: String = "#C1C8D8";
 </script>
 
 <div
 	class="fixed top-0 left-0 h-screen w-screen z-50 bg-[#262626] {showMobileNavbar
 		? 'flex'
 		: 'hidden'} flex-col items-center gap-10 p-2"
-		style="--theme-mainColor: {mainColors}"
+	style="--theme-mainColor: {mainColors}"
 >
 	<div class="w-full flex justify-end">
 		<svg
