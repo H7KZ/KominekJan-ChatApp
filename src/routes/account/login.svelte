@@ -26,7 +26,7 @@
 		user = await isUserLoggedIn();
 	});
 
-	async function login(e: Event) {
+	async function login(e: Event): Promise<void> {
 		e.preventDefault();
 
 		user.messageStatus = await logInUser(email, password);

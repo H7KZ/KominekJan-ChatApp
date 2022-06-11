@@ -2,11 +2,17 @@ import axios from "axios";
 
 import { apiURL } from "/src/lib/functions/api";
 
-export async function isUserLoggedIn() {
+export async function isUserLoggedIn(): Promise<{
+	display: boolean;
+	loggedUser: boolean;
+	messageStatus: string;
+}> {
 	let messageStatus: string = "";
 	let display: boolean = false;
 	let loggedUser: boolean = false;
-	const token = localStorage.getItem("jwt_token");
+
+	const token: string = localStorage.getItem("jwt_token");
+
 	if (!(token == null)) {
 		const config = {
 			headers: {
@@ -26,8 +32,6 @@ export async function isUserLoggedIn() {
 				loggedUser = false;
 				if (err.response) {
 					messageStatus = err.response.data.error.message;
-				} else if (err.request) {
-					console.log(err.request);
 				}
 			});
 	} else {

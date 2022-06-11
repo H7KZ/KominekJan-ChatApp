@@ -20,7 +20,7 @@
 		mainColor = await getMainColor();
 	});
 
-	async function signup(e: Event) {
+	async function signup(e: Event): Promise<void> {
 		e.preventDefault();
 
 		messageStatus = "loading . . .";

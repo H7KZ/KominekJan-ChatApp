@@ -8,7 +8,7 @@ export async function saveProfileChanges(
 	newPFP: string,
 	newMainColor: string,
 	newDisplayName: string
-) {
+): Promise<string> {
 	let messageStatus: string = "";
 
 	if (
@@ -22,7 +22,7 @@ export async function saveProfileChanges(
 		return messageStatus;
 	}
 
-	const token = localStorage.getItem("jwt_token");
+	const token: string = localStorage.getItem("jwt_token");
 	if (!(token == null)) {
 		const config = {
 			headers: {
@@ -48,8 +48,6 @@ export async function saveProfileChanges(
 			.catch((err) => {
 				if (err.response) {
 					messageStatus = err.response.data.error.message;
-				} else if (err.request) {
-					console.log(err.request);
 				}
 			});
 	}
@@ -57,7 +55,13 @@ export async function saveProfileChanges(
 	return messageStatus;
 }
 
-export async function getLoggedInUserData() {
+export async function getLoggedInUserData(): Promise<{
+	display: boolean;
+	loggedUser: boolean;
+	userDataLoaded: boolean;
+	userData: any;
+	messageStatus: string;
+}> {
 	let messageStatus: string = "";
 	let display: boolean = false;
 	let loggedUser: boolean = false;
@@ -70,7 +74,7 @@ export async function getLoggedInUserData() {
 		created: "",
 	};
 
-	const token = localStorage.getItem("jwt_token");
+	const token: string = localStorage.getItem("jwt_token");
 	if (!(token == null)) {
 		const config = {
 			headers: {
@@ -101,8 +105,6 @@ export async function getLoggedInUserData() {
 						userDataLoaded = true;
 						if (err.response) {
 							messageStatus = err.response.data.error.message;
-						} else if (err.request) {
-							console.log(err.request);
 						}
 					});
 			})
@@ -111,8 +113,6 @@ export async function getLoggedInUserData() {
 				loggedUser = false;
 				if (err.response) {
 					messageStatus = err.response.data.error.message;
-				} else if (err.request) {
-					console.log(err.request);
 				}
 			});
 	} else {

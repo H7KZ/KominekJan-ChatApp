@@ -37,14 +37,14 @@
 		user = await getLoggedInUserData();
 	});
 
-	async function logout(e: Event) {
+	async function logout(e: Event): Promise<void> {
 		e.preventDefault();
 
 		localStorage.removeItem("jwt_token");
 		location.reload();
 	}
 
-	async function saveChanges(e: Event) {
+	async function saveChanges(e: Event): Promise<void> {
 		e.preventDefault();
 
 		user.messageStatus = await saveProfileChanges(

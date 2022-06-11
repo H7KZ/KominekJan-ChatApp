@@ -9,7 +9,7 @@ export async function signUpUser(
 	display_name: string,
 	password: string,
 	confirmPassword: string
-) {
+): Promise<string> {
 	let messageStatus: string = "";
 
 	try {
@@ -46,8 +46,6 @@ export async function signUpUser(
 			}) => {
 				if (err.response) {
 					messageStatus = err.response.data.error.message;
-				} else if (err.request) {
-					console.log(err.request);
 				}
 			}
 		);

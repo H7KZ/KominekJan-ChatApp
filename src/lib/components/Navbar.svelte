@@ -13,7 +13,7 @@
 		mainColor = await getMainColor();
 	});
 
-	let fillColor: String = "#C1C8D8";
+	let fillColor: string = "#C1C8D8";
 
 	let showMobileNavbar: boolean = false;
 </script>

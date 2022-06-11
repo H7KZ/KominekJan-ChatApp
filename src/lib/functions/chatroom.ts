@@ -10,14 +10,14 @@ export function getUserPFP(pfp: string): string {
 	}
 }
 
-export async function isUserLoggedInCR() {
+export async function isUserLoggedInCR(): Promise<{ display: boolean; loggedUser: boolean; messageStatus: string; statusColor: string; }> {
 	let messageStatus: string = "";
 	let statusColor: string = "";
 
 	let display: boolean = false;
 	let loggedUser: boolean = false;
 
-	const token = localStorage.getItem("jwt_token");
+	const token: string = localStorage.getItem("jwt_token");
 	if (!(token == null)) {
 		const config = {
 			headers: {

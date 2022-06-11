@@ -9,6 +9,8 @@
 
 	import { getMainColor, checkMainColor } from "/src/lib/functions/mainColor";
 
+	import messageSchema from "/src/lib/functions/joiSchemas/message";
+
 	import { io } from "socket.io-client";
 
 	import axios from "axios";
@@ -28,10 +30,24 @@
 		statusColor: "",
 	};
 
-	const wait = (timeToDelay: number) =>
-		new Promise((resolve) => setTimeout(resolve, timeToDelay));
+	const wait = (timeToDelay: number): Promise<unknown> =>
+		new Promise((resolve): NodeJS.Timeout => setTimeout(resolve, timeToDelay));
 
 	const socket = io(`${apiURL}/`);
+
+	let messages: any = [];
+
+	let canSend: boolean = true;
+
+	let sidebar: boolean;
+
+	let rooms: any = chatRoomsList;
+
+	let activeRoom: any = rooms[0];
+
+	let messagesContainer: Element;
+
+	let mainColor: string = "";
 
 	socket.on("loadMessages", async (messagesList) => {
 		messages = messagesList;
@@ -42,20 +58,6 @@
 		user.messageStatus = error;
 		user.statusColor = "text-[#ff5b5b]";
 	});
-
-	let messages = [];
-
-	let canSend: boolean = true;
-
-	let sidebar: boolean;
-
-	let rooms = chatRoomsList;
-
-	let activeRoom = rooms[0];
-
-	let messagesContainer: Element;
-
-	let mainColor: string = "";
 
 	//ON MOUNT
 
@@ -112,21 +114,13 @@
 
 		//VALIDATE MESSAGE
 
-		if (
-			messageText.trim() == "" ||
-			messageText == null ||
-			messageText == undefined
-		) {
-			user.messageStatus = "⛔ You can't send an empty message";
-			user.statusColor = "text-[#ff5b5b]";
-			return;
-		}
-
-		if (messageText.length > 500) {
-			user.messageStatus =
-				"⛔ You can't send a message longer than 500 characters. You are over " +
-				(messageText.length - 500) +
-				" characters";
+		try {
+			await messageSchema.validateAsync({
+				messageText: messageText,
+				room_id: activeRoom.id,
+			});
+		} catch (err) {
+			user.messageStatus = "⛔ " + err;
 			user.statusColor = "text-[#ff5b5b]";
 			return;
 		}
@@ -136,7 +130,7 @@
 			user.messageStatus = "🚸 Sending . . .";
 			user.statusColor = "text-[#f5c842]";
 
-			const token = localStorage.getItem("jwt_token");
+			const token: string = localStorage.getItem("jwt_token");
 			if (!(token == null)) {
 				const config = {
 					headers: {
@@ -159,7 +153,7 @@
 						user.statusColor = "text-[#c6ff5b]";
 						timeout();
 					})
-					.catch(async (err) => {
+					.catch(async (err: any) => {
 						user.messageStatus = "⛔ " + err.response.data.error.message;
 						user.statusColor = "text-[#ff6565]";
 						await wait(8000);

@@ -5,22 +5,22 @@
 
 	import { getMainColor, checkMainColor } from "/src/lib/functions/mainColor";
 
-	let mainColors: string = "";
+	let mainColor: string = "";
 
 	onMount(async () => {
 		await checkMainColor();
 
-		mainColors = await getMainColor();
+		mainColor = await getMainColor();
 	});
 
-	let fillColor: String = "#C1C8D8";
+	let fillColor: string = "#C1C8D8";
 </script>
 
 <div
 	class="fixed top-0 left-0 h-screen w-screen z-50 bg-[#262626] {showMobileNavbar
 		? 'flex'
 		: 'hidden'} flex-col items-center gap-10 p-2"
-	style="--theme-mainColor: {mainColors}"
+	style="--theme-mainColor: {mainColor}"
 >
 	<div class="w-full flex justify-end">
 		<svg

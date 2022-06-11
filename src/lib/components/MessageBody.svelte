@@ -1,9 +1,9 @@
-<script>
+<script lang="ts">
 	import { getUserPFP } from "/src/lib/functions/chatroom";
 
-	export let message;
+	export let message: any;
 
-	export let nameColor;
+	export let nameColor: string;
 </script>
 
 <div

@@ -1,6 +1,6 @@
-import Joi from "joi";
+import Joi, { type ObjectSchema } from "joi";
 
-const signupSchema = Joi.object({
+const signupSchema: ObjectSchema = Joi.object({
 	email: Joi.string()
 		.email({ tlds: { allow: false } })
 		.required(),

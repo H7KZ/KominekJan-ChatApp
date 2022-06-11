@@ -1,4 +1,4 @@
-const chatRoomsList = [
+const chatRoomsList: any = [
 	{
 		name: "General 🏝️",
 		id: 0,

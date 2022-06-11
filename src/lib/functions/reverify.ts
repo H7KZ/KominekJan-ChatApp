@@ -4,13 +4,14 @@ import { apiURL } from "/src/lib/functions/api";
 
 import loginSchema from "/src/lib/functions/joiSchemas/login";
 
-export async function reverifyUser(email: string, password: string) {
+export async function reverifyUser(
+	email: string,
+	password: string
+): Promise<string> {
 	let messageStatus: string = "";
 
-	let value: any;
-
 	try {
-		value = await loginSchema.validateAsync({
+		await loginSchema.validateAsync({
 			email: email,
 			password: password,
 		});
@@ -23,8 +24,8 @@ export async function reverifyUser(email: string, password: string) {
 
 	await axios
 		.post(`${apiURL}/auth/verify/resend`, {
-			email: value.email,
-			password: value.password,
+			email: email,
+			password: password,
 		})
 		.then(() => {
 			location.replace("https://chat.kominekjan.cz/verify/reverify");
@@ -32,8 +33,6 @@ export async function reverifyUser(email: string, password: string) {
 		.catch((err) => {
 			if (err.response) {
 				messageStatus = err.response.data.error.message;
-			} else if (err.request) {
-				console.log(err.request);
 			}
 		});
 

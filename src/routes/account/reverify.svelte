@@ -26,7 +26,7 @@
 		user = await isUserLoggedIn();
 	});
 
-	async function reverify(e: Event) {
+	async function reverify(e: Event): Promise<void> {
 		e.preventDefault();
 
 		user.messageStatus = await reverifyUser(email, password);
