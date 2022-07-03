@@ -1,350 +1,353 @@
+<!--suppress LoopStatementThatDoesntLoopJS, LoopStatementThatDoesntLoopJS -->
 <script lang="ts">
-	//IMPORTS
+    //IMPORTS
 
-	import { onMount } from "svelte";
+    import {onMount} from "svelte";
 
-	import { isUserLoggedInCR } from "/src/lib/functions/chatroom";
+    import {isUserLoggedInCR} from "/src/lib/functions/chatroom";
 
-	import chatRoomsList from "/src/lib/data/chatroomList";
+    import chatRoomsList from "/src/lib/data/chatroomList";
 
-	import { getMainColor, checkMainColor } from "/src/lib/functions/mainColor";
+    import {checkMainColor, getMainColor} from "/src/lib/functions/mainColor";
 
-	import messageSchema from "/src/lib/functions/joiSchemas/message";
+    import messageSchema from "/src/lib/functions/joiSchemas/message";
 
-	import { io } from "socket.io-client";
+    import {io} from "socket.io-client";
 
-	import axios from "axios";
+    import axios from "axios";
 
-	import { apiURL } from "/src/lib/functions/api";
+    import {apiURL} from "/src/lib/functions/api";
 
-	import Menu from "/src/lib/components/Menu.svelte";
+    import Menu from "/src/lib/components/Menu.svelte";
 
-	import MessageBody from "/src/lib/components/MessageBody.svelte";
+    import MessageBody from "/src/lib/components/MessageBody.svelte";
 
-	//VARIABLES
+    //VARIABLES
 
-	let user: any = {
-		loggedUser: null,
-		display: null,
-		messageStatus: "loading . . .",
-		statusColor: "",
-	};
+    let user: any = {
+        loggedUser: null,
+        display: null,
+        messageStatus: "loading . . .",
+        statusColor: "",
+    };
 
-	const wait = (timeToDelay: number): Promise<unknown> =>
-		new Promise((resolve): NodeJS.Timeout => setTimeout(resolve, timeToDelay));
+    const wait = (timeToDelay: number): Promise<unknown> =>
+        new Promise((resolve): NodeJS.Timeout => setTimeout(resolve, timeToDelay));
 
-	const socket = io(`${apiURL}/`);
+    const socket = io(`${apiURL}/`);
 
-	let messages: any = [];
+    let messages: any = [];
 
-	let canSend: boolean = true;
+    let canSend: boolean = true;
 
-	let sidebar: boolean;
+    let sidebar: boolean;
 
-	let rooms: any = chatRoomsList;
+    let rooms: any = chatRoomsList;
 
-	let activeRoom: any = rooms[0];
+    let activeRoom: any = rooms[0];
 
-	let messagesContainer: Element;
+    let messagesContainer: Element;
 
-	let mainColor: string = "";
+    let mainColor: string = "";
 
-	socket.on("loadMessages", async (messagesList) => {
-		messages = messagesList;
-		messages.reverse();
-	});
+    socket.on("loadMessages", async (messagesList) => {
+        messages = messagesList;
+        messages.reverse();
+    });
 
-	socket.on("firstMessageError", (error) => {
-		user.messageStatus = error;
-		user.statusColor = "text-[#ff5b5b]";
-	});
+    socket.on("firstMessageError", (error) => {
+        user.messageStatus = error;
+        user.statusColor = "text-[#ff5b5b]";
+    });
 
-	//ON MOUNT
+    //ON MOUNT
 
-	onMount(async () => {
-		await checkMainColor();
+    onMount(async () => {
+        await checkMainColor();
 
-		mainColor = await getMainColor();
+        mainColor = getMainColor();
 
-		//GET LOGGED USER
-		user = await isUserLoggedInCR();
+        //GET LOGGED USER
+        user = await isUserLoggedInCR();
 
-		//MOVE MESSAGES CONTAINER
-		await wait(200);
-		messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        //MOVE MESSAGES CONTAINER
+        await wait(200);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-		//SOCKETS
-		socket.on("messages", async (messagesList) => {
-			messages = messagesList;
-			messages.reverse();
-			await wait(200);
-			messagesContainer.scrollTop = messagesContainer.scrollHeight;
-		});
+        //SOCKETS
+        socket.on("messages", async (messagesList) => {
+            messages = messagesList;
+            messages.reverse();
+            await wait(200);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        });
 
-		socket.on("messageError", (error) => {
-			user.messageStatus = error;
-			user.statusColor = "text-[#ff5b5b]";
-		});
+        socket.on("messageError", (error) => {
+            user.messageStatus = error;
+            user.statusColor = "text-[#ff5b5b]";
+        });
 
-		//SIDEBAR CHATROOM
-		sidebar = window.innerWidth < 768 ? false : true;
+        //SIDEBAR CHATROOM
+        sidebar = window.innerWidth >= 768;
 
-		window.addEventListener("resize", () => {
-			if (window.innerWidth < 768) {
-				sidebar = false;
-			} else {
-				sidebar = true;
-			}
-		});
+        window.addEventListener("resize", () => {
+            sidebar = window.innerWidth >= 768;
+        });
 
-		//MESSAGES CONTAINER SCROLL TO BOTTOM
-		while (messagesContainer.scrollTop != messagesContainer.scrollHeight) {
-			await wait(1000);
-			messagesContainer.scrollTop = messagesContainer.scrollHeight;
-			break;
-		}
-	});
+        //MESSAGES CONTAINER SCROLL TO BOTTOM
+        while (messagesContainer.scrollTop != messagesContainer.scrollHeight) {
+            await wait(1000);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            break;
+        }
+    });
 
-	//FUNCTIONS
+    //FUNCTIONS
 
-	let messageText: string;
+    let messageText: string;
 
-	async function sendMessage(e: Event): Promise<void> {
-		e.preventDefault();
+    async function sendMessage(e: Event): Promise<void> {
+        e.preventDefault();
 
-		//VALIDATE MESSAGE
+        //VALIDATE MESSAGE
 
-		try {
-			await messageSchema.validateAsync({
-				messageText: messageText,
-				room_id: activeRoom.id,
-			});
-		} catch (err) {
-			user.messageStatus = "⛔ " + err;
-			user.statusColor = "text-[#ff5b5b]";
-			return;
-		}
+        try {
+            await messageSchema.validateAsync({
+                messageText: messageText,
+                room_id: activeRoom.id,
+            });
+        } catch (err) {
+            user.messageStatus = "⛔ " + err;
+            user.statusColor = "text-[#ff5b5b]";
+            return;
+        }
 
-		//IS READY TO SEND
-		if (canSend) {
-			user.messageStatus = "🚸 Sending . . .";
-			user.statusColor = "text-[#f5c842]";
+        //IS READY TO SEND
+        if (canSend) {
+            user.messageStatus = "🚸 Sending . . .";
+            user.statusColor = "text-[#f5c842]";
 
-			const token: string = localStorage.getItem("jwt_token");
-			if (!(token == null)) {
-				const config = {
-					headers: {
-						authorization: `Bearer ${token}`,
-					},
-				};
+            const token: string = localStorage.getItem("jwt_token");
+            if (!(token == null)) {
+                const config = {
+                    headers: {
+                        authorization: `Bearer ${token}`,
+                    },
+                };
 
-				await axios
-					.post(
-						`${apiURL}/message/send`,
-						{
-							message: messageText,
-							room_id: activeRoom.id,
-						},
-						config
-					)
-					.then(async () => {
-						messageText = "";
-						user.messageStatus = "✔️ Message sent!";
-						user.statusColor = "text-[#c6ff5b]";
-						timeout();
-					})
-					.catch(async (err: any) => {
-						user.messageStatus = "⛔ " + err.response.data.error.message;
-						user.statusColor = "text-[#ff6565]";
-						await wait(8000);
-						user.messageStatus = "👍 You can send another message";
-					});
-			}
-		} else {
-			user.messageStatus = "⛔ You can't send another message! Wait 10s!";
-			user.statusColor = "text-[#ff6565]";
-		}
-	}
+                await axios
+                    .post(
+                        `${apiURL}/message/send`,
+                        {
+                            message: messageText,
+                            room_id: activeRoom.id,
+                        },
+                        config
+                    )
+                    .then(async () => {
+                        messageText = "";
+                        user.messageStatus = "✔️ Message sent!";
+                        user.statusColor = "text-[#c6ff5b]";
+                        await timeout();
+                    })
+                    .catch(async (err: any) => {
+                        user.messageStatus = "⛔ " + err.response.data.error.message;
+                        user.statusColor = "text-[#ff6565]";
+                        await wait(8000);
+                        user.messageStatus = "👍 You can send another message";
+                    });
+            }
+        } else {
+            user.messageStatus = "⛔ You can't send another message! Wait 10s!";
+            user.statusColor = "text-[#ff6565]";
+        }
+    }
 
-	async function timeout(): Promise<void> {
-		canSend = false;
-		user.messageStatus = "⛔ Wait 5s before sending another message";
-		user.statusColor = "text-[#ff6565]";
-		await wait(5000);
-		canSend = true;
-		user.messageStatus = "👍 You can send another message";
-		user.statusColor = "text-[#c6ff5b]";
-	}
+    async function timeout(): Promise<void> {
+        canSend = false;
+        user.messageStatus = "⛔ Wait 5s before sending another message";
+        user.statusColor = "text-[#ff6565]";
+        await wait(5000);
+        canSend = true;
+        user.messageStatus = "👍 You can send another message";
+        user.statusColor = "text-[#c6ff5b]";
+    }
 
-	async function switchRooms(room: {
-		name: string;
-		id: number;
-	}): Promise<void> {
-		activeRoom = room;
-		socket.emit("switchRoom", activeRoom.id.toString());
-		await wait(500);
-		messagesContainer.scrollTop = messagesContainer.scrollHeight;
-	}
+    async function switchRooms(room: {
+        name: string;
+        id: number;
+    }): Promise<void> {
+        activeRoom = room;
+        socket.emit("switchRoom", activeRoom.id.toString());
+        await wait(500);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
 </script>
 
 <!--HTML-->
 <div
-	class="min-h-screen h-screen w-screen flex justify-center items-center pt-20 pb-4"
-	style="--theme-mainColor: {mainColor};"
+        class="min-h-screen h-screen w-screen flex justify-center items-center pt-20 pb-4"
+        style="--theme-mainColor: {mainColor};"
 >
-	{#if user.loggedUser && user.display}
-		<!--MESSAGES-->
-		<div class="h-full w-full flex font-ms">
-			<!--SIDEBAR OF ROOMS-->
-			{#if sidebar}
-				<div class="h-full w-60 bg-[#222222] flex-shrink-0 z-20">
-					<div class="flex flex-col items-start gap-2 py-2 px-4">
-						<h2 class="mainColor text-xl font-bold">Rooms:</h2>
-						{#each rooms as room}
-							<button
-								class="text-grayWhite h-full w-full text-left bg-[#444444] rounded-lg pl-2"
-								on:click={() => switchRooms(room)}
-							>
-								<span class="italic">#</span>
-								{room.name}
-							</button>
-						{/each}
-					</div>
-				</div>
-			{/if}
+    {#if user.loggedUser && user.display}
+        <!--MESSAGES-->
+        <div class="h-full w-full flex font-ms">
+            <!--SIDEBAR OF ROOMS-->
+            {#if sidebar}
+                <div class="h-full w-60 bg-[#222222] flex-shrink-0 z-20">
+                    <div class="flex flex-col items-start gap-2 py-2 px-4">
+                        <h2 class="mainColor text-xl font-bold">Rooms:</h2>
+                        {#each rooms as room}
+                            <button
+                                    class="text-grayWhite h-full w-full text-left bg-[#444444] rounded-lg pl-2"
+                                    on:click={() => switchRooms(room)}
+                            >
+                                <span class="italic">#</span>
+                                {room.name}
+                            </button>
+                        {/each}
+                    </div>
+                </div>
+            {/if}
 
-			<!--CHATROOM-->
-			<div class="h-full w-full flex flex-col gap-4">
-				<!--CHATROOM HEADER-->
-				<div
-					class="flex items-center gap-2 pl-2 h-12 bg-[#222222] text-grayWhite flex-shrink-0"
-				>
-					<div
-						class="dropdown z-30 {sidebar ? 'hidden' : 'block'} cursor-pointer"
-					>
-						<div>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								viewBox="0 0 24 24"
-								style="fill: {mainColor};"
-								class="h-8"
-								><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z" /></svg
-							>
-						</div>
-						<div
-							class="hidden absolute w-60 flex-col gap-4 py-2 px-3 bg-[#383838] dropdown-content"
-						>
-							{#each rooms as room}
-								<button
-									class="text-grayWhite h-full w-full text-left bg-[#444444] rounded-lg pl-2"
-									on:click={() => switchRooms(room)}
-								>
-									<span class="italic">#</span>
-									{room.name}
-								</button>
-							{/each}
-						</div>
-					</div>
-					<h2>
-						<span class="italic">#</span>
-						{activeRoom.name}
-					</h2>
-				</div>
-				<!--DISPLAY MESSAGES-->
-				<div class="h-full w-full overflow-y-hidden px-1 md:px-4">
-					<div
-						class="h-full w-full overflow-y-scroll scroll-smooth custom-scrollbar"
-						bind:this={messagesContainer}
-					>
-						<!--DISPLAYING MESSAGES-->
-						{#each messages as message}
-							<MessageBody {message} nameColor={mainColor} />
-						{/each}
-					</div>
-				</div>
+            <!--CHATROOM-->
+            <div class="h-full w-full flex flex-col gap-4">
+                <!--CHATROOM HEADER-->
+                <div
+                        class="flex items-center gap-2 pl-2 h-12 bg-[#222222] text-grayWhite flex-shrink-0"
+                >
+                    <div
+                            class="dropdown z-30 {sidebar ? 'hidden' : 'block'} cursor-pointer"
+                    >
+                        <div>
+                            <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24"
+                                    style="fill: {mainColor};"
+                                    class="h-8"
+                            >
+                                <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/>
+                            </svg
+                            >
+                        </div>
+                        <div
+                                class="hidden absolute w-60 flex-col gap-4 py-2 px-3 bg-[#383838] dropdown-content"
+                        >
+                            {#each rooms as room}
+                                <button
+                                        class="text-grayWhite h-full w-full text-left bg-[#444444] rounded-lg pl-2"
+                                        on:click={() => switchRooms(room)}
+                                >
+                                    <span class="italic">#</span>
+                                    {room.name}
+                                </button>
+                            {/each}
+                        </div>
+                    </div>
+                    <h2>
+                        <span class="italic">#</span>
+                        {activeRoom.name}
+                    </h2>
+                </div>
+                <!--DISPLAY MESSAGES-->
+                <div class="h-full w-full overflow-y-hidden px-1 md:px-4">
+                    <div
+                            class="h-full w-full overflow-y-scroll scroll-smooth custom-scrollbar"
+                            bind:this={messagesContainer}
+                    >
+                        <!--DISPLAYING MESSAGES-->
+                        {#each messages as message}
+                            <MessageBody {message} nameColor={mainColor}/>
+                        {/each}
+                    </div>
+                </div>
 
-				<!--SEND MESSAGE-->
-				<div class="flex flex-col gap-1 px-1 md:px-4">
-					<div class="h-20 flex items-start gap-2">
+                <!--SEND MESSAGE-->
+                <div class="flex flex-col gap-1 px-1 md:px-4">
+                    <div class="h-20 flex items-start gap-2">
 						<textarea
-							name="messageBox"
-							class="resize-none h-full w-full bg-[#222222] border-2 borderColor text-sm md:text-base rounded-md outline-none px-2 py-1 text-grayWhite"
-							placeholder="Type your message..."
-							bind:value={messageText}
-						/>
-						<!-- svelte-ignore missing-declaration -->
-						<button
-							class="h-full border-2 borderColor rounded-md w-20 flex items-center justify-center"
-							on:click={() => sendMessage(event)}
-						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								viewBox="0 0 24 24"
-								class="h-12 transition-colors ease-out duration-150 fillIconColor"
-								><path
-									d="M11 8.414V18h2V8.414l4.293 4.293 1.414-1.414L12 4.586l-6.707 6.707 1.414 1.414z"
-								/></svg
-							>
-						</button>
-					</div>
-					<p class="text-xs {user.statusColor} md:text-sm">
-						{user.messageStatus}
-					</p>
-				</div>
-			</div>
-		</div>
-	{:else if !user.loggedUser && user.display}
-		<!--YOU ARE NOT LOGGED IN-->
-		<div
-			class="flex flex-col gap-10 items-center text-grayWhite text-xl font-semibold sm:text-2xl"
-		>
-			<h2 class="font-ms text-2xl">
-				You need to be logged in to chat! u moron
-			</h2>
-			<Menu />
-			<p class="text-base text-[#ff6565] sm:text-lg">{user.messageStatus}</p>
-		</div>
-	{/if}
+                                name="messageBox"
+                                class="resize-none h-full w-full bg-[#222222] border-2 borderColor text-sm md:text-base rounded-md outline-none px-2 py-1 text-grayWhite"
+                                placeholder="Type your message..."
+                                bind:value={messageText}></textarea>
+                        <!-- svelte-ignore missing-declaration -->
+                        <!--suppress JSDeprecatedSymbols -->
+                        <button
+                                class="h-full border-2 borderColor rounded-md w-20 flex items-center justify-center"
+                                on:click={() => sendMessage(event)}
+                        >
+                            <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24"
+                                    class="h-12 transition-colors ease-out duration-150 fillIconColor"
+                            >
+                                <path
+                                        d="M11 8.414V18h2V8.414l4.293 4.293 1.414-1.414L12 4.586l-6.707 6.707 1.414 1.414z"
+                                />
+                            </svg
+                            >
+                        </button>
+                    </div>
+                    <p class="text-xs {user.statusColor} md:text-sm">
+                        {user.messageStatus}
+                    </p>
+                </div>
+            </div>
+        </div>
+    {:else if !user.loggedUser && user.display}
+        <!--YOU ARE NOT LOGGED IN-->
+        <div
+                class="flex flex-col gap-10 items-center text-grayWhite text-xl font-semibold sm:text-2xl"
+        >
+            <h2 class="font-ms text-2xl">
+                You need to be logged in to chat! u moron
+            </h2>
+            <Menu/>
+            <p class="text-base text-[#ff6565] sm:text-lg">{user.messageStatus}</p>
+        </div>
+    {/if}
 </div>
 
 <!--STYLES-->
 <style scoped>
-	.custom-scrollbar {
-		scrollbar-width: none;
-		scrollbar-color: var(--theme-mainColor);
-	}
-	/* Chrome, Edge, and Safari */
-	.custom-scrollbar::-webkit-scrollbar {
-		width: 8px;
-		background-color: #222222;
-		border-radius: 4px;
-	}
-	.custom-scrollbar::-webkit-scrollbar-thumb {
-		background-color: var(--theme-mainColor);
-		border-radius: 4px;
-	}
+    .custom-scrollbar {
+        scrollbar-width: none;
+        scrollbar-color: var(--theme-mainColor);
+    }
 
-	.dropdown:hover .dropdown-content {
-		display: flex;
-	}
+    /* Chrome, Edge, and Safari */
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 8px;
+        background-color: #222222;
+        border-radius: 4px;
+    }
 
-	.mainColor {
-		color: var(--theme-mainColor);
-	}
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background-color: var(--theme-mainColor);
+        border-radius: 4px;
+    }
 
-	.borderColor {
-		border-color: var(--theme-mainColor);
-	}
+    .dropdown:hover .dropdown-content {
+        display: flex;
+    }
 
-	.hoverButtonColor:hover {
-		color: var(--theme-mainColor);
-	}
+    .mainColor {
+        color: var(--theme-mainColor);
+    }
 
-	.fillIconColor {
-		fill: #fff;
-	}
+    .borderColor {
+        border-color: var(--theme-mainColor);
+    }
 
-	.fillIconColor:hover {
-		fill: var(--theme-mainColor);
-	}
+    .hoverButtonColor:hover {
+        color: var(--theme-mainColor);
+    }
+
+    .fillIconColor {
+        fill: #fff;
+    }
+
+    .fillIconColor:hover {
+        fill: var(--theme-mainColor);
+    }
 </style>

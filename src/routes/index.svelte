@@ -1,65 +1,65 @@
 <script lang="ts">
-	import { onMount } from "svelte";
+    import {onMount} from "svelte";
 
-	import { isUserLoggedIn } from "/src/lib/functions/token";
+    import {isUserLoggedIn} from "/src/lib/functions/token";
 
-	import { getMainColor, checkMainColor } from "/src/lib/functions/mainColor";
+    import {checkMainColor, getMainColor} from "/src/lib/functions/mainColor";
 
-	import Menu from "/src/lib/components/Menu.svelte";
+    import Menu from "/src/lib/components/Menu.svelte";
 
-	let user: any = {
-		loggedUser: null,
-		display: null,
-		messageStatus: "loading . . .",
-	};
+    let user: any = {
+        loggedUser: null,
+        display: null,
+        messageStatus: "loading . . .",
+    };
 
-	let mainColor: string = "";
+    let mainColor: string = "";
 
-	onMount(async () => {
-		await checkMainColor();
+    onMount(async () => {
+        await checkMainColor();
 
-		mainColor = await getMainColor();
+        mainColor = getMainColor();
 
-		user = await isUserLoggedIn();
-	});
+        user = await isUserLoggedIn();
+    });
 </script>
 
 <div
-	class="min-h-screen h-full w-full flex justify-center items-center"
-	style="--theme-mainColor: {mainColor}"
+        class="min-h-screen h-full w-full flex justify-center items-center"
+        style="--theme-mainColor: {mainColor}"
 >
-	<div
-		class="w-full flex flex-col gap-10 font-ms font-semibold text-xl text-grayWhite text-center sm:text-2xl"
-	>
-		<h1 class="mainColor text-2xl sm:text-4xl">
-			The best chat room ever<br />
-			<span class="font-bold italic text-grayWhite">(no cap).</span>
-		</h1>
-		{#if user.loggedUser && user.display}
-			<a href="/chatroom">
-				<button
-					class="border-2 borderColor font-semibold px-10 py-2 rounded-md transition-colors ease-out duration-150 hoverButtonColor"
-				>
-					go to ChatRoom
-				</button>
-			</a>
-		{:else if !user.loggedUser && user.display}
-			<Menu />
-		{/if}
-		<p class="text-base text-[#ff6565] sm:text-lg">{user.messageStatus}</p>
-	</div>
+    <div
+            class="w-full flex flex-col gap-10 font-ms font-semibold text-xl text-grayWhite text-center sm:text-2xl"
+    >
+        <h1 class="mainColor text-2xl sm:text-4xl">
+            The best chat room ever<br/>
+            <span class="font-bold italic text-grayWhite">(no cap).</span>
+        </h1>
+        {#if user.loggedUser && user.display}
+            <a href="/chatroom">
+                <button
+                        class="border-2 borderColor font-semibold px-10 py-2 rounded-md transition-colors ease-out duration-150 hoverButtonColor"
+                >
+                    go to ChatRoom
+                </button>
+            </a>
+        {:else if !user.loggedUser && user.display}
+            <Menu/>
+        {/if}
+        <p class="text-base text-[#ff6565] sm:text-lg">{user.messageStatus}</p>
+    </div>
 </div>
 
 <style scoped>
-	.mainColor {
-		color: var(--theme-mainColor);
-	}
+    .mainColor {
+        color: var(--theme-mainColor);
+    }
 
-	.borderColor {
-		border-color: var(--theme-mainColor);
-	}
+    .borderColor {
+        border-color: var(--theme-mainColor);
+    }
 
-	.hoverButtonColor:hover {
-		color: var(--theme-mainColor);
-	}
+    .hoverButtonColor:hover {
+        color: var(--theme-mainColor);
+    }
 </style>
